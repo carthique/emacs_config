@@ -78,9 +78,17 @@
 (use-package go-eldoc :defer t)
 (use-package docker :defer t)
 (use-package dockerfile-mode :defer t)
+(use-package elpy :defer t)
+(use-package flycheck :defer t)
+(use-package py-autopep8 :defer t)
+(use-package blacken :defer t)
+
 
 (autoload 'gid "idutils" nil t)
-;(ac-config-default)
+(ac-config-default)
+
+(setq mac-option-key-is-meta nil)
+(setq mac-command-key-is-meta t)
 
 (setq mac-option-key-is-meta nil)
 (setq mac-command-key-is-meta t)
@@ -219,7 +227,7 @@
  '(magit-pull-arguments nil)
  '(package-selected-packages
    (quote
-    (dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab simplenote2 rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))))
+    (blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab simplenote2 rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -712,7 +720,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     (compile (concat "go run " (buffer-name)))))
 
 (defun my-go-mode-hook ()
-  (auto-complete-mode 1)
+  ;;(auto-complete-mode 1)
   (setq gofmt-command "goimports")
   ; Call Gofmt before saving
   (add-hook 'before-save-hook 'gofmt-before-save)
@@ -729,8 +737,8 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   )
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
-(with-eval-after-load 'go-mode
-   (require 'go-autocomplete))
+;;(with-eval-after-load 'go-mode
+;;   (require 'go-autocomplete))
 (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode)
 
 (defun go-run-buffer()
@@ -738,3 +746,16 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   (shell-command (concat "go run " (buffer-name))))
 
 ;;(add-hook 'go-mode-hook 'go-eldoc-setup)
+(setq leetcode-prefer-language "c")
+(setq leetcode-prefer-sql "mysql")
+
+(elpy-enable)
+
+;; Enable Flycheck
+(when (require 'flycheck nil t)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+;; Enable autopep8
+(require 'py-autopep8)
+(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
