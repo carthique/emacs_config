@@ -8,6 +8,8 @@
 (require 'package)
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -60,7 +62,7 @@
 ;(require 'xcscope)
 (use-package bpr :defer t)
 (use-package f :defer t)
-(use-package scp :defer t)
+;;(use-package scp :defer t)
 (use-package hungry-delete :defer t)
 (use-package anzu :defer t)
 (use-package smart-tab :defer t)
@@ -218,16 +220,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-    ("bcc6775934c9adf5f3bd1f428326ce0dcd34d743a92df48c128e6438b815b44f" "68d36308fc6e7395f7e6355f92c1dd9029c7a672cbecf8048e2933a053cf27e6" "400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default)))
+   '("bcc6775934c9adf5f3bd1f428326ce0dcd34d743a92df48c128e6438b815b44f" "68d36308fc6e7395f7e6355f92c1dd9029c7a672cbecf8048e2933a053cf27e6" "400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default))
  '(global-evil-search-highlight-persist t)
- '(magit-commit-arguments (quote ("--all")))
+ '(magit-commit-arguments '("--all"))
  '(magit-diff-arguments nil)
- '(magit-fetch-arguments (quote ("--prune")))
+ '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   (quote
-    (blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab simplenote2 rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))))
+   '(blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab simplenote2 rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
