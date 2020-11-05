@@ -1,7 +1,7 @@
 (package-initialize)
 ;;(add-to-list 'load-path "/home/kshan001/.emacs.d/elpa/")
 ;;(add-to-list 'custom-theme-load-path "/home/kshan001/.emacs.d/themes/")
-;;(add-to-list 'load-path "/Users/carthique/.emacs.d/lisp/")
+(add-to-list 'load-path "/home/kashankar/.emacs.d/lisp/")
 ;;(add-to-list 'custom-theme-load-path "/Users/carthique/.emacs.d/themes/")
 
 (setq inhibit-splash-screen t)         ; hide welcome screen
@@ -44,11 +44,13 @@
              '("MELPA" .
                "http://melpa.milkbox.net/packages/"))
 
+(require 'p4)
+(require 'thingatpt+)
 (use-package xah-get-thing :defer t)
 (require 'xah-get-thing)
 ;; Enable emacs package manager
-(use-package thingatpt :defer t)
-;;(use-package thingatpt+ :defer t)
+;(use-package thingatpt :defer t)
+;(use-package thingatpt+ :defer t)
 (use-package xah-replace-pairs :defer t)
 ;;(require 'xeu_elisp_util)
 (use-package desktop :defer t)
@@ -84,19 +86,18 @@
 (use-package flycheck :defer t)
 (use-package py-autopep8 :defer t)
 (use-package blacken :defer t)
-(use-package pylint :defer t)
 
 
 (autoload 'gid "idutils" nil t)
 (ac-config-default)
 
-(setq mac-option-key-is-meta nil)
-(setq mac-command-key-is-meta t)
+;(setq mac-option-key-is-meta nil)
+;(setq mac-command-key-is-meta t)
 
-(setq mac-option-key-is-meta nil)
-(setq mac-command-key-is-meta t)
-(setq mac-command-modifier 'meta)
-(setq mac-option-modifier 'super)
+;(setq mac-option-key-is-meta nil)
+;(setq mac-command-key-is-meta t)
+;(setq mac-command-modifier 'meta)
+;(setq mac-option-modifier 'super)
 
 ;;; No Menubar, Toolbar and Scrollbar
 (tool-bar-mode -1)
@@ -134,7 +135,7 @@
 ;; disable tabs in Make files
 (add-hook 'makefile-mode-hook (lambda () (setq indent-tabs-mode t)))
 ;;Setup cscope
-;;(setq cscope-option-do-not-update-database t)
+(setq cscope-option-do-not-update-database t)
 ;;Org mode link click
 (setq org-return-follows-link nil)
 ;; Set the desktop save mode
@@ -206,7 +207,7 @@
 ;;(add-hook 'c-mode-hook 'cscope-minor-mode)
 
 ;;Show number of matches in mode-line while searching
-(global-anzu-mode +1)
+;;(global-anzu-mode +1)
 
 ;; Smart tabs
 (global-smart-tab-mode 1)
@@ -228,7 +229,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(pyenv-mode-auto pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab simplenote2 rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
+   '(blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab simplenote2 rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -283,11 +284,11 @@
 (global-set-key (kbd "M-6") 'magit-refs-ws6)
 (global-set-key (kbd "M-7") 'magit-refs-ws7)
 
-;; Control Key bindings
-(global-set-key [C-M-up] 'beginning-of-buffer)
-(global-set-key [C-M-down] 'end-of-buffer)
-(global-set-key [C-s-up] 'backward-up-list)
-(global-set-key [C-s-down] 'forward-list)
+;; control key bindings
+(global-set-key [M-s-up] 'beginning-of-buffer)
+(global-set-key [M-s-down] 'end-of-buffer)
+(global-set-key [\C-\s-up] 'backward-up-list)
+(global-set-key [\C-\s-down] 'forward-list)
 (global-set-key "\C-x\C-x" 'buffer-menu)
 (global-set-key "\C-c\C-x" 'pretty-print-xml-region)
 (global-set-key [(control x) (k)] 'kill-this-buffer)
@@ -300,12 +301,8 @@
 ;; Meta Key bindings
 (global-set-key [M-up] 'c-beginning-of-defun)
 (global-set-key [M-down] 'c-end-of-defun)
-;;(global-set-key "\M-s"      'cscope-find-this-symbol)
-(global-set-key "\M-s"      'git-grep)
-(global-set-key "\M-l"      'git-grep-local)
-;;(global-set-key "\M-g"      'cscope-find-global-definition)
-;;(global-set-key "\M-f"      'cscope-find-this-file)
-;;(global-set-key "\M-i"      'cscope-find-files-including-file)
+;;(global-set-key "\M-s"      'git-grep)
+;;(global-set-key "\M-l"      'git-grep-local)
 (global-set-key "\M-d"      'vc-diff)
 (global-set-key "\M-D"      'vc-root-diff)
 (global-set-key "\C-\M-d"      'magit-diff-range)
@@ -415,15 +412,19 @@
         ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
         (t (self-insert-command (or arg 1)))))
 
+(defvar root_dir)
 (defun mygrep_dir_all ()
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
+  (my-tell-user-about-directory)
   (let (mygrepresult)
-    (setq bds (xah-get-thing-at-cursor 'word))
-    (setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    ;(setq bds (xah-get-thing-at-cursor 'word))
+    ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
-            (f-long(vc-root-dir))))
+                                        ;(f-long(vc-root-dir))))
+            (concat "" root_dir)))
       (grep (concat "cat cscope.files | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.*\\( . | grep -B 1 '"  myresult "'")
             ))))
 
@@ -431,18 +432,21 @@
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
   (let (mygrepresult)
-    (setq bds (xah-get-thing-at-cursor 'word))
-    (setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    ;;(setq bds (xah-get-thing-at-cursor 'word))
+    ;;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
-    (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*.h' \\-\\-include='*.c' \\-\\-include='*.cpp' \\-\\-include='*.ovsschema' \\-\\-include='*.in' \\-\\-include='*.mib' | grep -B 1 '"  myresult "'")
+    ;;(grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*.h' \\-\\-include='*.c' \\-\\-include='*.cpp' \\-\\-include='*.ovsschema' \\-\\-include='*.in' \\-\\-include='*.mib' | grep -B 1 '"  myresult "'")
+    (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*.py' | grep -B 1 '"  myresult "'")
           )))
 
 (defun mygrep_file ()
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
   (let (mygrepresult)
-    (setq bds (xah-get-thing-at-cursor 'word))
-    (setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    ;;(setq bds (tap-thing-at-point-as-string 'sexp))
+    ;;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( " (file-name-nondirectory (buffer-file-name)) " | grep -B 1 '"  myresult "'")
           )))
@@ -637,9 +641,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     (and backend
          (ignore-errors
            (vc-call-backend backend 'root default-directory)))))
-(defun test-func ()
-  (interactive)
-  (message (concat "depth " (f-long(vc-root-dir)))))
 
 
 (defun git-grep-prompt ()
@@ -750,7 +751,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (setq leetcode-prefer-language "c")
 (setq leetcode-prefer-sql "mysql")
 
-(setq elpy-rpc-virtualenv-path 'current)
 (elpy-enable)
 
 ;; Enable Flycheck
@@ -758,10 +758,33 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
   (add-hook 'elpy-mode-hook 'flycheck-mode))
 
+;;(add-hook 'python-mode-hook 'cscope-minor-mode)
 ;; Enable autopep8
 (require 'py-autopep8)
 (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
-(add-hook 'elpy-mode-hook 'pylint-add-menu-items)
-(add-hook 'elpy-mode-hook 'pylint-add-key-bindings)
-(add-hook 'python-mode-hook 'pylint-add-menu-items)
-(add-hook 'python-mode-hook 'pylint-add-key-bindings)
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (cscope-minor-mode)
+            (local-set-key "\M-s"      'cscope-find-this-symbol)
+            (local-set-key "\M-g"      'cscope-find-global-definition)
+            (local-set-key "\M-f"      'cscope-find-this-file)
+            (local-set-key "\M-i"      'cscope-find-files-including-file)
+            )
+          )
+
+(defun my-tell-user-about-directory ()
+  "Display the name of the directory containing the cscope database."
+  (interactive)
+  (let (info directory)
+    (setq info (cscope-find-info nil))
+    (if (= (length info) 1)
+	(progn
+	  (setq directory (car (car info)))
+      (setq root_dir (car (car info)))
+	  (message (concat "directory: " root_dir))
+	  ))))
+
+(defun test-func ()
+  (interactive)
+  (message (concat "depth " (tap-thing-at-point-as-string 'sexp))))
