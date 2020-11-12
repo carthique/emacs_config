@@ -1,8 +1,8 @@
 (package-initialize)
-;;(add-to-list 'load-path "/home/kshan001/.emacs.d/elpa/")
-;;(add-to-list 'custom-theme-load-path "/home/kshan001/.emacs.d/themes/")
-(add-to-list 'load-path "/home/kashankar/.emacs.d/lisp/")
-;;(add-to-list 'custom-theme-load-path "/Users/carthique/.emacs.d/themes/")
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+;;(add-to-list 'load-path "~/.emacs.d/elpa/")
+;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
 (setq inhibit-splash-screen t)         ; hide welcome screen
 (require 'package)
@@ -23,8 +23,8 @@
   (if window-system
       (progn
         (if (> (x-display-pixel-height) 1080)
-            (set-face-attribute 'default nil :height 140)
-         (set-face-attribute 'default nil :height 125)))))
+            (set-face-attribute 'default nil :height 190)
+         (set-face-attribute 'default nil :height 190)))))
 
 ;; Fontify current frame
 (fontify-frame nil)
@@ -45,6 +45,7 @@
                "http://melpa.milkbox.net/packages/"))
 
 (require 'p4)
+(require 'vc-p4)
 (require 'thingatpt+)
 (use-package xah-get-thing :defer t)
 (require 'xah-get-thing)
@@ -59,7 +60,6 @@
 ;(require 'auto-complete-config)
 ;(require 'yasnippet)
 ;;(require 'sudo-edit)
-(use-package simplenote2 :defer t)
 (use-package expand-region :defer t)
 ;(require 'xcscope)
 (use-package bpr :defer t)
@@ -91,13 +91,13 @@
 (autoload 'gid "idutils" nil t)
 (ac-config-default)
 
-;(setq mac-option-key-is-meta nil)
-;(setq mac-command-key-is-meta t)
+;;(setq mac-option-key-is-meta nil)
+;;(setq mac-command-key-is-meta t)
 
-;(setq mac-option-key-is-meta nil)
-;(setq mac-command-key-is-meta t)
-;(setq mac-command-modifier 'meta)
-;(setq mac-option-modifier 'super)
+;;(setq mac-option-key-is-meta nil)
+;;(setq mac-command-key-is-meta t)
+;;(setq mac-command-modifier 'super)
+;;(setq mac-option-modifier 'meta)
 
 ;;; No Menubar, Toolbar and Scrollbar
 (tool-bar-mode -1)
@@ -188,7 +188,7 @@
   ;;(setq c-recognize-knr-p t)
   (c-set-offset 'case-label '4)
   (define-key c-mode-map "\C-m" 'newline-and-indent)
-  (define-key c-mode-map "\C-c\C-s" 'org-insert-email-as-current-todo)
+  (define-key c-mode-map "\C-c \C-s" 'org-insert-email-as-current-todo)
   (local-set-key [f9]    'compile-cpm-in-parent-directory)
   (local-set-key [C-f9]  'compile-hops-in-parent-directory)
   (local-set-key [M-f9]  'compile-both-in-parent-directory)
@@ -229,7 +229,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab simplenote2 rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
+   '(blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -249,12 +249,10 @@
 
 
 ;; Function Key bindings
-;;(global-set-key [f1]    (lambda() (interactive)(find-file "~/backup/scratchpad/notepad.org")))
-;;(global-set-key [M-f1]   (lambda() (interactive)(dired "~/backup/scratchpad/")))
-(global-set-key [f1]   (lambda() (interactive)(simplenote2--open-note "~/.simplenote2/notes/1cc4f8eb680111e7b118d5b0153eff08")))
-(global-set-key [M-f1]    'simplenote2-list)
+(global-set-key [C-f1]    (lambda() (interactive)(find-file "~/backup/scratchpad/notepad.org")))
+(global-set-key [M-f1]   (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [s-f1]  'open-log-file)
-(global-set-key [C-f1]  (lambda() (interactive)(find-file "~/backup/scratchpad/todo.org")))
+(global-set-key [f1]  (lambda() (interactive)(find-file "~/backup/scratchpad/todo.org")))
 (global-set-key [f2]    'goto-line)
 (global-set-key [f3]    'magit-status)
 (global-set-key [f4]    'magit-show-refs)
@@ -265,14 +263,15 @@
 (global-set-key [f7]    'magit-log-buffer-file)
 (global-set-key [f8]    'magit-log-current)
 (global-set-key [M-f8]  'magit-log-all-branches)
-;(global-set-key [f10]  (lambda() (interactive)(find-file "~/backup/scratchpad/temp.log")))
-(global-set-key [f10]   (lambda() (interactive)(simplenote2--open-note "~/.simplenote2/notes/ef8a33ba680311e7bde43da2e452bf1f")))
+(global-set-key [f10]  (lambda() (interactive)(find-file "~/backup/scratchpad/temp.log")))
 (global-set-key [f11]   'match-paren)
 (global-set-key [f12]   'open-emacs-file)
 (global-set-key [M-f12] 'load-emacs)
 (global-set-key (kbd "C-Q") 'er/expand-region)
-(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 125)))
-(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 140)))
+(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 180)))
+(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 180)))
+(global-set-key [M-up] 'beginning-of-defun)
+(global-set-key [M-down] 'end-of-defun)
 ;(global-set-key (kbd "C-a") 'mark-whole-buffer)
 
 (global-set-key (kbd "M-0") 'magit-refs-ws0)
@@ -299,12 +298,10 @@
 
 (setq dumb-jump-fallback-search nil)
 ;; Meta Key bindings
-(global-set-key [M-up] 'c-beginning-of-defun)
-(global-set-key [M-down] 'c-end-of-defun)
 ;;(global-set-key "\M-s"      'git-grep)
 ;;(global-set-key "\M-l"      'git-grep-local)
-(global-set-key "\M-d"      'vc-diff)
-(global-set-key "\M-D"      'vc-root-diff)
+(global-set-key (kbd "s-d")      'vc-diff)
+(global-set-key (kbd "s-D")      'vc-root-diff)
 (global-set-key "\C-\M-d"      'magit-diff-range)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
@@ -331,12 +328,12 @@
 (global-set-key (kbd "s-5") 'magit-refs-ws5)
 (global-set-key (kbd "s-6") 'magit-refs-ws6)
 (global-set-key (kbd "s-7") 'magit-refs-ws7)
-(global-set-key (kbd "s-d") (lambda() (interactive)(write-file "~/patch.diff")))
+;;(global-set-key (kbd "s-d") (lambda() (interactive)(write-file "~/patch.diff")))
 (global-set-key (kbd "s-w") 'gid)
 (global-set-key (kbd "s-<left>")  'windmove-left)
 (global-set-key (kbd "s-<right>") 'windmove-right)
 (global-set-key (kbd "s-c") 'string-inflection-lower-camelcase)
-(global-set-key (kbd "s-g") 'simplenote2-sync-notes)
+;;(global-set-key (kbd "s-g") 'simplenote2-sync-notes)
 
 ;;Diff mode hooks
 (add-hook 'diff-mode-hook
@@ -421,11 +418,13 @@
     ;(setq bds (xah-get-thing-at-cursor 'word))
     ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
     (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Grep in branch (%s): " myresult)
+                                nil nil myresult))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
                                         ;(f-long(vc-root-dir))))
             (concat "" root_dir)))
-      (grep (concat "cat cscope.files | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.*\\( . | grep -B 1 '"  myresult "'")
+      (grep (concat "find -cmin -9999999 | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.*\\( . | grep -B 1 '"  myresult "'")
             ))))
 
 (defun mygrep ()
@@ -435,9 +434,11 @@
     ;;(setq bds (xah-get-thing-at-cursor 'word))
     ;;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
     (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Grep in directory (%s): " myresult)
+                                nil nil myresult))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     ;;(grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*.h' \\-\\-include='*.c' \\-\\-include='*.cpp' \\-\\-include='*.ovsschema' \\-\\-include='*.in' \\-\\-include='*.mib' | grep -B 1 '"  myresult "'")
-    (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*.py' | grep -B 1 '"  myresult "'")
+    (grep (concat "find -cmin -9999999 | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*' | grep -B 1 '"  myresult "'")
           )))
 
 (defun mygrep_file ()
@@ -447,6 +448,8 @@
     ;;(setq bds (tap-thing-at-point-as-string 'sexp))
     ;;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
     (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Grep in file (%s): " myresult)
+                                nil nil myresult))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( " (file-name-nondirectory (buffer-file-name)) " | grep -B 1 '"  myresult "'")
           )))
@@ -523,8 +526,6 @@ Also returns nil if pid is nil."
     (setq ad-return-value nil)))
 
 ;; simplenote
-(setq simplenote2-email "carthique@gmail.com")
-(setq simplenote2-password "Creative9!")
 (simplenote2-setup)
 (savehist-mode 1)
 
@@ -763,13 +764,68 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (require 'py-autopep8)
 (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
 
+
+(defun mygrep_py_dir_all ()
+  "grep function for grepint `xah-get-thing-at-cursor' "
+  (interactive)
+  (my-tell-user-about-directory)
+  (let (mygrepresult)
+    ;(setq bds (xah-get-thing-at-cursor 'word))
+    ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Grep in branch (%s): " myresult)
+                                nil nil myresult))
+    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
+    (let ((default-directory
+                                        ;(f-long(vc-root-dir))))
+            (concat "" root_dir)))
+      (grep (concat "cat cscope.files | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.*\\( . | grep -B 1 '"  myresult "'")
+            ))))
+
+(defun mygrep_py_def_all ()
+  "grep function for grepint `xah-get-thing-at-cursor' "
+  (interactive)
+  (my-tell-user-about-directory)
+  (let (mygrepresult)
+    ;(setq bds (xah-get-thing-at-cursor 'word))
+    ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    (setq myresult (concat "def " (tap-thing-at-point-as-string 'sexp)))
+    (setq myresult (read-string (format "Grep in branch (%s): " myresult)
+                                nil nil myresult))
+    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
+    (let ((default-directory
+                                        ;(f-long(vc-root-dir))))
+            (concat "" root_dir)))
+      (grep (concat "cat cscope.files | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.*\\( . | grep -B 1 '"  myresult "'")
+            ))))
+
+(defun mygrep_py ()
+  "grep function for grepint `xah-get-thing-at-cursor' "
+  (interactive)
+  (let (mygrepresult)
+    ;;(setq bds (xah-get-thing-at-cursor 'word))
+    ;;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Grep in directory (%s): " myresult)
+                                nil nil myresult))
+    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
+    ;;(grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*.h' \\-\\-include='*.c' \\-\\-include='*.cpp' \\-\\-include='*.ovsschema' \\-\\-include='*.in' \\-\\-include='*.mib' | grep -B 1 '"  myresult "'")
+    (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.*\\( \\-\\-include='*.py' | grep -B 1 '"  myresult "'")
+          )))
+
 (add-hook 'python-mode-hook
           (lambda ()
             (cscope-minor-mode)
-            (local-set-key "\M-s"      'cscope-find-this-symbol)
-            (local-set-key "\M-g"      'cscope-find-global-definition)
-            (local-set-key "\M-f"      'cscope-find-this-file)
-            (local-set-key "\M-i"      'cscope-find-files-including-file)
+            (local-set-key (kbd "M-b")  'org-insert-email-as-current-todo)
+            (local-set-key "\s-s"      'cscope-find-this-symbol)
+            (local-set-key "\s-g"      'cscope-find-global-definition)
+            (local-set-key "\s-f"      'cscope-find-this-file)
+            (local-set-key "\s-i"      'cscope-find-files-including-file)
+            (local-set-key (kbd "M-d") 'mygrep_py)
+            (local-set-key (kbd "M-s") 'mygrep_py_dir_all)
+            (local-set-key (kbd "M-g") 'mygrep_py_def_all)
+            (local-set-key (kbd "M-f") 'beginning-of-defun)
+            (local-set-key (kbd "M-F") 'end-of-defun)
             )
           )
 
@@ -787,4 +843,11 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 (defun test-func ()
   (interactive)
-  (message (concat "depth " (tap-thing-at-point-as-string 'sexp))))
+  (setq str (tap-thing-at-point-as-string 'sexp))
+  (setq str (read-string (format "Grep (%s): " str)
+                             nil nil str))
+  (message (concat "depth " str)))
+
+(defun search-class ()
+  (interactive)
+  (search-forward "fox")
