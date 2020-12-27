@@ -1,4 +1,5 @@
 (package-initialize)
+(defvar home_dir "/home/kashankar/" "home directory")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 ;;(add-to-list 'load-path "~/.emacs.d/elpa/")
 ;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -6,13 +7,16 @@
 
 (setq inhibit-splash-screen t)         ; hide welcome screen
 (require 'package)
+(require 'xcscope)
+(custom-set-variables
+ '(gnutls-algorithm-priority "normal:-vers-tls1.3"))
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+;(unless (package-installed-p 'use-package)
+;  (package-refresh-contents)
+;  (package-install 'use-package))
 (require 'dired)
 
 (require 'use-package-ensure)
@@ -22,9 +26,9 @@
   (interactive)
   (if window-system
       (progn
-        (if (> (x-display-pixel-height) 1080)
-            (set-face-attribute 'default nil :height 190)
-         (set-face-attribute 'default nil :height 190)))))
+        (if (> (x-display-pixel-height) 3072)
+            (set-face-attribute 'default nil :height 160)
+         (set-face-attribute 'default nil :height 220)))))
 
 ;; Fontify current frame
 (fontify-frame nil)
@@ -57,12 +61,10 @@
 (use-package bpr :defer t)
 (use-package f :defer t)
 (use-package hungry-delete :defer t)
-(use-package anzu :defer t)
 (use-package smart-tab :defer t)
 (use-package zenburn-theme :defer t)
 (use-package smex :defer t)
 (use-package rainbow-delimiters :defer t)
-(use-package magit :defer t)
 (use-package dumb-jump :defer t)
 (use-package wgrep :defer t)
 (use-package go-mode :defer t)
@@ -70,26 +72,37 @@
 (use-package go-guru :defer t)
 (use-package flymake-go :defer t)
 (use-package go-eldoc :defer t)
-(use-package docker :defer t)
 (use-package dockerfile-mode :defer t)
 (use-package elpy :defer t)
 (use-package flycheck :defer t)
 (use-package py-autopep8 :defer t)
-(use-package blacken :defer t)
 (use-package grep-a-lot :defer t)
+(use-package anzu :defer t)
+(use-package magit :defer t)
+(use-package docker :defer t)
+(use-package blacken :defer t)
 (grep-a-lot-setup-keys)
 
 
 (autoload 'gid "idutils" nil t)
 (ac-config-default)
 
-;;(setq mac-option-key-is-meta nil)
-;;(setq mac-command-key-is-meta t)
 
-;;(setq mac-option-key-is-meta nil)
-;;(setq mac-command-key-is-meta t)
-;;(setq mac-command-modifier 'super)
-;;(setq mac-option-modifier 'meta)
+(setq mac-option-key-is-meta nil)
+(setq mac-command-key-is-meta t)
+
+;; the following 4 lines work on mac book 16
+;(setq mac-option-key-is-meta nil)
+;(setq mac-command-key-is-meta t)
+;(setq mac-command-modifier 'meta)
+;(setq mac-option-modifier 'super)
+
+;; the following 4 lines used to work with newer emacs, maybe!
+;(setq mac-option-key-is-meta nil)
+;(setq mac-command-key-is-meta t)
+;(setq mac-command-modifier 'super)
+;(setq mac-option-modifier 'meta)
+
 
 ;;; No Menubar, Toolbar and Scrollbar
 (setq kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions))
@@ -237,12 +250,13 @@
 
 
 ;; Function Key bindings
-(global-set-key [f1]    (lambda() (interactive)(find-file "~/backup/scratchpad/todo.org")))
-(global-set-key [C-f1]  (lambda() (interactive)(find-file "~/backup/scratchpad/notepad.org")))
-(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
+(global-set-key [f1]    (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/todo.org"))))
+(global-set-key [C-f1]  (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/notepad.org"))))
+(global-set-key [M-f1]  'p4-opened)
+;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [f2]    'goto-line)
-(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 180)))
-(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 180)))
+(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 220)))
+(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 160)))
 (global-set-key [f3]    'magit-status)
 (global-set-key [f4]    'magit-show-refs)
 (global-set-key [f5]    'my-revert-buffer)
@@ -252,7 +266,7 @@
 (global-set-key [f7]    'magit-log-buffer-file)
 (global-set-key [f8]    'magit-log-current)
 (global-set-key [M-f8]  'magit-log-all-branches)
-(global-set-key [f10]   (lambda() (interactive)(find-file "~/backup/scratchpad/temp.log")))
+(global-set-key [f10]   (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/ut.org"))))
 (global-set-key [f11]   'match-paren)
 (global-set-key [f12]   'open-emacs-file)
 (global-set-key [M-f12] 'load-emacs)
@@ -288,7 +302,7 @@
 ;; Meta Key bindings
 ;;(global-set-key "\M-s"      'git-grep)
 ;;(global-set-key "\M-l"      'git-grep-local)
-(global-set-key (kbd "s-d")      'vc-diff)
+;;(global-set-key (kbd "s-d")      'vc-diff)
 (global-set-key (kbd "s-D")      'vc-root-diff)
 (global-set-key "\C-\M-d"      'magit-diff-range)
 (global-set-key (kbd "M-x") 'smex)
@@ -302,8 +316,8 @@
 (global-set-key (kbd "s-s") 'mygrep)
 (global-set-key [s-down] 'next-error)
 (global-set-key [s-up] 'previous-error)
-;;(global-set-key [s-down] 'smerge-next)
-;;(global-set-key [s-up] 'smerge-prev)
+;(global-set-key [s-down] 'smerge-next)
+;(global-set-key [s-up] 'smerge-prev)
 (global-set-key (kbd "s-m") 'smerge-keep-mine)
 (global-set-key (kbd "s-o") 'smerge-keep-other)
 (global-set-key (kbd "s-c") 'comment-or-uncomment-region)
@@ -392,11 +406,11 @@
 
 (defun open-log-file ()
   (interactive)
-  (find-file "~/.screen_log"))
+  (find-file (concat home_dir "screen_log")))
 
 (defun open-emacs-file ()
   (interactive)
-  (find-file "~/.emacs.d/init.el"))
+  (find-file (concat home_dir ".emacs.d/init.el")))
 
 (defun match-paren (arg)
   "Go to the matching parenthesis if on parenthesis otherwise insert %."
@@ -492,7 +506,7 @@ by using nxml's indentation rules."
 (setf org-make-link-description-function #'org-link-describe)
 
 (defvar *org-email-todo-tree-header* "*** Coding TODOS")
-(defvar *org-email-todo-list-buffer* "~/backup/scratchpad/todo.org")
+(defvar *org-email-todo-list-buffer* (concat home_dir "backup/scratchpad/todo.org"))
 
 (defun org-insert-email-as-current-todo ()
   (interactive)
@@ -757,12 +771,12 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 ;(setq leetcode-prefer-language "c")
 ;(setq leetcode-prefer-sql "mysql")
 
-(elpy-enable)
+;(elpy-enable)
 
 ;; Enable Flycheck
-(when (require 'flycheck nil t)
- (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
- (add-hook 'elpy-mode-hook 'flycheck-mode))
+;(when (require 'flycheck nil t)
+; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+; (add-hook 'elpy-mode-hook 'flycheck-mode))
 
 ;;(add-hook 'python-mode-hook 'cscope-minor-mode)
 ;; Enable autopep8
@@ -803,6 +817,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             (local-set-key (kbd "S-f") 'beginning-of-defun)
             (local-set-key (kbd "S-F") 'end-of-defun)
             (local-set-key (kbd "M-p") 'pylint)
+            (local-set-key (kbd "s-d") 'p4-diff)
             (local-set-key [f9]    'compile-lambda)
             )
           )
@@ -845,3 +860,33 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     ;(highlight-phrase "test" "hi-yellow")
     ))
 
+(defun sudo-edit-current-file ()
+  (interactive)
+  (let ((my-file-name) ; fill this with the file to open
+        (position))    ; if the file is already open save position
+    (if (equal major-mode 'dired-mode) ; test if we are in dired-mode 
+        (progn
+          (setq my-file-name (dired-get-file-for-visit))
+          (find-alternate-file (prepare-tramp-sudo-string my-file-name)))
+      (setq my-file-name (buffer-file-name); hopefully anything else is an already opened file
+            position (point))
+      (find-alternate-file (prepare-tramp-sudo-string my-file-name))
+      (goto-char position))))
+
+
+(defun prepare-tramp-sudo-string (tempfile)
+  (if (file-remote-p tempfile)
+      (let ((vec (tramp-dissect-file-name tempfile)))
+
+        (tramp-make-tramp-file-name
+         "sudo"
+         (tramp-file-name-user nil)
+         (tramp-file-name-host vec)
+         (tramp-file-name-localname vec)
+         (format "ssh:%s@%s|"
+                 (tramp-file-name-user vec)
+                 (tramp-file-name-host vec))))
+    (concat "/sudo:root@localhost:" tempfile)))
+
+(define-key dired-mode-map [s-return] 'sudo-edit-current-file)
+(define-key p4-opened-list-mode-map (kbd "s-d") 'p4-diff)
