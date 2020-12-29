@@ -210,7 +210,7 @@
 ;;(add-hook 'c-mode-hook 'cscope-minor-mode)
 
 ;;Show number of matches in mode-line while searching
-;;(global-anzu-mode +1)
+(global-anzu-mode +1)
 
 ;; Smart tabs
 (global-smart-tab-mode 1)
@@ -258,7 +258,7 @@
 ;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [f2]    'goto-line)
 (global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 220)))
-(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 160)))
+(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 120)))
 (global-set-key [f3]    'magit-status)
 (global-set-key [f4]    'magit-show-refs)
 (global-set-key [f5]    'my-revert-buffer)
@@ -712,7 +712,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (cond ((eq system-type 'darwin)
        (toggle-frame-maximized)
        (add-to-list 'default-frame-alist '(fullscreen . maximized))
-       (set-face-attribute 'default nil :height 140)
+       (set-face-attribute 'default nil :height 120)
        )
 )
 
