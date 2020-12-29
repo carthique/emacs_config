@@ -14,9 +14,9 @@
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
-;(unless (package-installed-p 'use-package)
-;  (package-refresh-contents)
-;  (package-install 'use-package))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 (require 'dired)
 
 (require 'use-package-ensure)
@@ -302,7 +302,7 @@
 (global-set-key "\M-s"      'git-grep)
 (global-set-key "\M-l"      'git-grep-local)
 (global-set-key "\M-d"      'vc-diff)
-(global-set-key "M-D"       'vc-root-diff)
+(global-set-key "\M-D"       'vc-root-diff)
 (global-set-key "\C-\M-d"   'magit-diff-range)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
