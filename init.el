@@ -28,7 +28,7 @@
       (progn
         (if (> (x-display-pixel-height) 3072)
             (set-face-attribute 'default nil :height 160)
-         (set-face-attribute 'default nil :height 220)))))
+         (set-face-attribute 'default nil :height 160)))))
 
 ;; Fontify current frame
 (fontify-frame nil)
@@ -51,9 +51,11 @@
 ;;(require 'p4)
 ;;(require 'vc-p4)
 (require 'thingatpt+)
+
 (use-package xah-get-thing :defer t)
 (require 'xah-get-thing)
 ;; Enable emacs package manager
+(use-package thingatpt :defer t)
 (use-package xah-replace-pairs :defer t)
 (use-package desktop :defer t)
 (use-package whitespace :defer t)
@@ -97,10 +99,10 @@
 (setq mac-option-modifier 'super)
 
 ;; the following 4 lines used to work with newer emacs, maybe!
-;(setq mac-option-key-is-meta nil)
+;;(setq mac-option-key-is-meta nil)
 ;(setq mac-command-key-is-meta t)
-;(setq mac-command-modifier 'super)
-;(setq mac-option-modifier 'meta)
+;(setq mac-command-modifier 'meta)
+;;(setq mac-option-modifier 'super)
 
 
 ;;; No Menubar, Toolbar and Scrollbar
@@ -310,9 +312,9 @@
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
 ;; Super Key bindings
-(global-set-key (kbd "S-s") 'mygrep_dir_all)
-(global-set-key (kbd "S-f") 'mygrep_file)
-(global-set-key (kbd "S-d") 'mygrep)
+(global-set-key (kbd "s-s") 'mygrep_dir_all)
+(global-set-key (kbd "s-f") 'mygrep_file)
+(global-set-key (kbd "s-d") 'mygrep)
 (global-set-key [s-down] 'next-error)
 (global-set-key [s-up] 'previous-error)
 ;(global-set-key [s-down] 'smerge-next)
@@ -409,7 +411,7 @@
 
 (defun open-emacs-file ()
   (interactive)
-  (find-file (concat home_dir ".emacs.d/init.el")))
+  (find-file "~/.emacs.d/init.el"))
 
 (defun match-paren (arg)
   "Go to the matching parenthesis if on parenthesis otherwise insert %."
@@ -419,6 +421,13 @@
         (t (self-insert-command (or arg 1)))))
 
 (defvar root_dir)
+
+(defun vc-root-dir ()
+  (let ((backend (vc-deduce-backend)))
+    (and backend
+         (ignore-errors
+           (vc-call-backend backend 'root default-directory)))))
+
 (defun mygrep_dir_all ()
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
@@ -433,7 +442,7 @@
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
             ;(f-long(vc-root-dir))))
-            (concat "" root_dir)))
+            (vc-root-dir)))
       (if (file-exists-p "cscope.files")
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
@@ -655,12 +664,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   (interactive)
   (unhighlight-regexp t))
 
-(defun vc-root-dir ()
-  (let ((backend (vc-deduce-backend)))
-    (and backend
-         (ignore-errors
-           (vc-call-backend backend 'root default-directory)))))
-
 
 (defun git-grep-prompt ()
   (let* ((default (current-word))
@@ -796,7 +799,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
             ;(f-long(vc-root-dir))))
-            (concat "" root_dir)))
+            (vc-root-dir)))
       (if (file-exists-p "cscope.files")
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
@@ -839,6 +842,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 	  (message (concat "directory: " root_dir))
 	  ))))
 
+
 (defun test-func ()
   (interactive)
   (setq str (tap-thing-at-point-as-string 'sexp))
@@ -874,7 +878,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
             ;(f-long(vc-root-dir))))
-            (concat "" root_dir)))
+            (vc-root-dir)))
       (if (file-exists-p "cscope.files")
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
@@ -911,3 +915,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     (concat "/sudo:root@localhost:" tempfile)))
 
 (define-key dired-mode-map [s-return] 'sudo-edit-current-file)
+
+(defun test-func ()
+  (interactive)
+  (message (concat "depth " (vc-root-dir))))
