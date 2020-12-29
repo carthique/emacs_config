@@ -41,15 +41,15 @@
 (add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
 ;(run-with-idle-timer 0.1 nil 'toggle-fullscreen)
 (set-cursor-color "#ffffff")
-;;(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :height 180)
 
 ;; Any add to list for package-archives (to add marmalade or melpa) goes here
 (add-to-list 'package-archives
              '("MELPA" .
                "http://melpa.milkbox.net/packages/"))
 
-(require 'p4)
-(require 'vc-p4)
+;;(require 'p4)
+;;(require 'vc-p4)
 (require 'thingatpt+)
 (use-package xah-get-thing :defer t)
 (require 'xah-get-thing)
@@ -87,15 +87,14 @@
 (autoload 'gid "idutils" nil t)
 (ac-config-default)
 
-
-(setq mac-option-key-is-meta nil)
-(setq mac-command-key-is-meta t)
-
-;; the following 4 lines work on mac book 16
 ;(setq mac-option-key-is-meta nil)
 ;(setq mac-command-key-is-meta t)
-;(setq mac-command-modifier 'meta)
-;(setq mac-option-modifier 'super)
+
+;; the following 4 lines work on mac book 16
+(setq mac-option-key-is-meta nil)
+(setq mac-command-key-is-meta t)
+(setq mac-command-modifier 'meta)
+(setq mac-option-modifier 'super)
 
 ;; the following 4 lines used to work with newer emacs, maybe!
 ;(setq mac-option-key-is-meta nil)
@@ -300,20 +299,20 @@
 
 (setq dumb-jump-fallback-search nil)
 ;; Meta Key bindings
-;;(global-set-key "\M-s"      'git-grep)
-;;(global-set-key "\M-l"      'git-grep-local)
-;;(global-set-key (kbd "s-d")      'vc-diff)
-(global-set-key (kbd "s-D")      'vc-root-diff)
-(global-set-key "\C-\M-d"      'magit-diff-range)
+(global-set-key "\M-s"      'git-grep)
+(global-set-key "\M-l"      'git-grep-local)
+(global-set-key "\M-d"      'vc-diff)
+(global-set-key "M-D"       'vc-root-diff)
+(global-set-key "\C-\M-d"   'magit-diff-range)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 ;; This is your old M-x.
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
 ;; Super Key bindings
-(global-set-key (kbd "M-s") 'mygrep_dir_all)
-(global-set-key (kbd "M-f") 'mygrep_file)
-(global-set-key (kbd "s-s") 'mygrep)
+(global-set-key (kbd "S-s") 'mygrep_dir_all)
+(global-set-key (kbd "S-f") 'mygrep_file)
+(global-set-key (kbd "S-d") 'mygrep)
 (global-set-key [s-down] 'next-error)
 (global-set-key [s-up] 'previous-error)
 ;(global-set-key [s-down] 'smerge-next)
@@ -817,7 +816,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             (local-set-key (kbd "S-f") 'beginning-of-defun)
             (local-set-key (kbd "S-F") 'end-of-defun)
             (local-set-key (kbd "M-p") 'pylint)
-            (local-set-key (kbd "s-d") 'p4-diff)
+            ;;(local-set-key (kbd "s-d") 'p4-diff)
             (local-set-key [f9]    'compile-lambda)
             )
           )
@@ -860,6 +859,29 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     ;(highlight-phrase "test" "hi-yellow")
     ))
 
+
+(defun myfind_dir_all ()
+  "grep function for grepint `xah-get-thing-at-cursor' "
+  (interactive)
+  (my-tell-user-about-directory)
+  ;(kill-grep)
+  (let (mygrepresult)
+    ;(setq bds (xah-get-thing-at-cursor 'word))
+    ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Find in branch (%s): " myresult)
+                                nil nil myresult))
+    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
+    (let ((default-directory
+            ;(f-long(vc-root-dir))))
+            (concat "" root_dir)))
+      (if (file-exists-p "cscope.files")
+          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
+        (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
+        )
+      ;(highlight-phrase myresult "hi-yellow")
+      )))
+
 (defun sudo-edit-current-file ()
   (interactive)
   (let ((my-file-name) ; fill this with the file to open
@@ -883,10 +905,9 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
          (tramp-file-name-user nil)
          (tramp-file-name-host vec)
          (tramp-file-name-localname vec)
-         (format "ssh:%s@%s|"
+         (format "/ssh:%s@%s|"
                  (tramp-file-name-user vec)
                  (tramp-file-name-host vec))))
     (concat "/sudo:root@localhost:" tempfile)))
 
 (define-key dired-mode-map [s-return] 'sudo-edit-current-file)
-(define-key p4-opened-list-mode-map (kbd "s-d") 'p4-diff)
