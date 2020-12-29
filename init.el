@@ -8,6 +8,7 @@
 (setq inhibit-splash-screen t)         ; hide welcome screen
 (require 'package)
 (require 'xcscope)
+(require 'f)
 (custom-set-variables
  '(gnutls-algorithm-priority "normal:-vers-tls1.3"))
 (add-to-list 'package-archives
@@ -441,8 +442,8 @@
                                 nil nil myresult))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
-            ;(f-long(vc-root-dir))))
-            (vc-root-dir)))
+            (f-long(vc-root-dir))))
+            ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
@@ -798,8 +799,8 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
                                 nil nil myresult))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
-            ;(f-long(vc-root-dir))))
-            (vc-root-dir)))
+            (f-long(vc-root-dir))))
+            ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
@@ -877,8 +878,8 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
                                 nil nil myresult))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (let ((default-directory
-            ;(f-long(vc-root-dir))))
-            (vc-root-dir)))
+            (f-long(vc-root-dir))))
+            ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
@@ -916,6 +917,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 (define-key dired-mode-map [s-return] 'sudo-edit-current-file)
 
-(defun test-func ()
+(defun test-func1 ()
   (interactive)
-  (message (concat "depth " (vc-root-dir))))
+  (message (concat "depth " (f-long(vc-root-dir)))))
