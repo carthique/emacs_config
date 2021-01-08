@@ -1,5 +1,7 @@
 (package-initialize)
 (defvar home_dir "/home/kashankar/" "home directory")
+(defconst font_size_mac 160 "mac monitor")
+(defconst font_size_ws 190 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 ;;(add-to-list 'load-path "~/.emacs.d/elpa/")
 ;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -10,7 +12,20 @@
 (require 'xcscope)
 (require 'f)
 (custom-set-variables
- '(gnutls-algorithm-priority "normal:-vers-tls1.3"))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("bcc6775934c9adf5f3bd1f428326ce0dcd34d743a92df48c128e6438b815b44f" "68d36308fc6e7395f7e6355f92c1dd9029c7a672cbecf8048e2933a053cf27e6" "400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default))
+ '(global-evil-search-highlight-persist t)
+ '(gnutls-algorithm-priority "normal:-vers-tls1.3")
+ '(magit-commit-arguments '("--all"))
+ '(magit-diff-arguments nil)
+ '(magit-fetch-arguments '("--prune"))
+ '(magit-pull-arguments nil)
+ '(package-selected-packages
+   '(pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -27,22 +42,22 @@
   (interactive)
   (if window-system
       (progn
-        (if (> (x-display-pixel-height) 3072)
-            (set-face-attribute 'default nil :height 160)
-         (set-face-attribute 'default nil :height 160)))))
+        (if (> (x-display-pixel-height) 1440)
+            (set-face-attribute 'default nil :height font_size_ws)
+         (set-face-attribute 'default nil :height font_size_mac)))))
 
 ;; Fontify current frame
 (fontify-frame nil)
 
 ;; Fontify any future frames
-(push 'fontify-frame after-make-frame-functions)
+;;(push 'fontify-frame after-make-frame-functions)
 
 (setq x-select-request-type 'STRING)
 ;;(add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
 ;(run-with-idle-timer 0.1 nil 'toggle-fullscreen)
 (set-cursor-color "#ffffff")
-(set-face-attribute 'default nil :height 180)
+;(set-face-attribute 'default nil :height font_size_ws)
 
 ;; Any add to list for package-archives (to add marmalade or melpa) goes here
 (add-to-list 'package-archives
@@ -84,25 +99,36 @@
 (use-package magit :defer t)
 (use-package docker :defer t)
 (use-package blacken :defer t)
+(use-package pylint :defer t)
 (grep-a-lot-setup-keys)
+
+(autoload 'pylint "pylint")
+(add-hook 'python-mode-hook 'pylint-add-menu-items)
+(add-hook 'python-mode-hook 'pylint-add-key-bindings)
 
 
 (autoload 'gid "idutils" nil t)
 (ac-config-default)
 
+
+;Make sure the following VNC settings are on
+; - Do not send special keys
+; - Set Options keys to Super_L
+; - Set Cmd keys to Alt_L
+
 ;(setq mac-option-key-is-meta nil)
 ;(setq mac-command-key-is-meta t)
 
 ;; the following 4 lines work on mac book 16
-(setq mac-option-key-is-meta nil)
-(setq mac-command-key-is-meta t)
-(setq mac-command-modifier 'meta)
-(setq mac-option-modifier 'super)
+;(setq mac-option-key-is-meta nil)
+;(setq mac-command-key-is-meta t)
+;(setq mac-command-modifier 'meta)
+;(setq mac-option-modifier 'super)
 
 ;; the following 4 lines used to work with newer emacs, maybe!
 ;;(setq mac-option-key-is-meta nil)
-;(setq mac-command-key-is-meta t)
-;(setq mac-command-modifier 'meta)
+;;(setq mac-command-key-is-meta t)
+;;(setq mac-command-modifier 'control)
 ;;(setq mac-option-modifier 'super)
 
 
@@ -219,20 +245,7 @@
 ;;(load-theme 'material t)
 ;;(load-theme 'dark-laptop t)
 (load-theme 'zenburn t)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("bcc6775934c9adf5f3bd1f428326ce0dcd34d743a92df48c128e6438b815b44f" "68d36308fc6e7395f7e6355f92c1dd9029c7a672cbecf8048e2933a053cf27e6" "400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default))
- '(global-evil-search-highlight-persist t)
- '(magit-commit-arguments '("--all"))
- '(magit-diff-arguments nil)
- '(magit-fetch-arguments '("--prune"))
- '(magit-pull-arguments nil)
- '(package-selected-packages
-   '(blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -257,8 +270,8 @@
 (global-set-key [M-f1]  'p4-opened)
 ;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [f2]    'goto-line)
-(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 220)))
-(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height 120)))
+(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_ws)))
+(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_mac)))
 (global-set-key [f3]    'magit-status)
 (global-set-key [f4]    'magit-show-refs)
 (global-set-key [f5]    'my-revert-buffer)
@@ -712,7 +725,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (cond ((eq system-type 'darwin)
        (toggle-frame-maximized)
        (add-to-list 'default-frame-alist '(fullscreen . maximized))
-       (set-face-attribute 'default nil :height 120)
+       ;;(set-face-attribute 'default nil :height font_size_ws)
        )
 )
 
@@ -773,13 +786,14 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 ;;(add-hook 'go-mode-hook 'go-eldoc-setup)
 ;(setq leetcode-prefer-language "c")
 ;(setq leetcode-prefer-sql "mysql")
+(setq elpy-shell-use-project-root nil)
 
-;(elpy-enable)
+(elpy-enable)
 
 ;; Enable Flycheck
-;(when (require 'flycheck nil t)
-; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-; (add-hook 'elpy-mode-hook 'flycheck-mode))
+(when (require 'flycheck nil t)
+ (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+(add-hook 'elpy-mode-hook 'flycheck-mode))
 
 ;;(add-hook 'python-mode-hook 'cscope-minor-mode)
 ;; Enable autopep8
