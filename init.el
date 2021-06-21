@@ -1,7 +1,7 @@
 (package-initialize)
 (defvar home_dir "/home/kashankar/" "home directory")
-(defconst font_size_mac 160 "mac monitor")
-(defconst font_size_ws 190 "wide screen monitor")
+(defconst font_size_mac 130 "mac monitor")
+(defconst font_size_ws 140 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 ;;(add-to-list 'load-path "~/.emacs.d/elpa/")
 ;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -16,6 +16,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
  '(custom-safe-themes
    '("bcc6775934c9adf5f3bd1f428326ce0dcd34d743a92df48c128e6438b815b44f" "68d36308fc6e7395f7e6355f92c1dd9029c7a672cbecf8048e2933a053cf27e6" "400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default))
  '(global-evil-search-highlight-persist t)
@@ -25,7 +26,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
+   '(dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -64,8 +65,8 @@
              '("MELPA" .
                "http://melpa.milkbox.net/packages/"))
 
-;;(require 'p4)
-;;(require 'vc-p4)
+(require 'p4)
+(require 'vc-p4)
 (require 'thingatpt+)
 
 (use-package xah-get-thing :defer t)
@@ -92,7 +93,7 @@
 (use-package go-eldoc :defer t)
 (use-package dockerfile-mode :defer t)
 (use-package elpy :defer t)
-(use-package flycheck :defer t)
+;(use-package flycheck :defer t)
 (use-package py-autopep8 :defer t)
 (use-package grep-a-lot :defer t)
 (use-package anzu :defer t)
@@ -100,7 +101,14 @@
 (use-package docker :defer t)
 (use-package blacken :defer t)
 (use-package pylint :defer t)
+(use-package avy :defer t)
+(use-package sublimity :defer t)
+
 (grep-a-lot-setup-keys)
+
+(avy-setup-default)
+(global-set-key (kbd "C-c C-j") 'avy-resume)
+
 
 (autoload 'pylint "pylint")
 (add-hook 'python-mode-hook 'pylint-add-menu-items)
@@ -108,7 +116,7 @@
 
 
 (autoload 'gid "idutils" nil t)
-(ac-config-default)
+;(ac-config-default)
 
 
 ;Make sure the following VNC settings are on
@@ -183,6 +191,7 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 ;; Enable whitespace markers
 ;;(setq whitespace-style '(face empty tabs lines-tail trailing))
+(setq whitespace-line-column 120)
 (setq whitespace-style '(face empty lines-tail trailing))
 (global-whitespace-mode t)
 ;; xah find parameters
@@ -287,8 +296,9 @@
 (global-set-key [M-f12] 'load-emacs)
 (global-set-key [f13]  'open-log-file)
 (global-set-key (kbd "C-Q") 'er/expand-region)
-;;(global-set-key (kbd "M-<up>" 'beginning-of-defun)
-;;(global-set-key (kbd "M-<down>" 'end-of-defun)
+(global-set-key (kbd "C-f") 'avy-goto-char-timer)
+;(global-set-key (kbd "M-<up>") 'beginning-of-defun)
+;(global-set-key (kbd "M-<down>") 'end-of-defun)
 ;(global-set-key (kbd "C-a") 'mark-whole-buffer)
 
 (global-set-key (kbd "M-0") 'magit-refs-ws0)
@@ -303,8 +313,12 @@
 ;; control key bindings
 (global-set-key [M-s-up] 'beginning-of-buffer)
 (global-set-key [M-s-down] 'end-of-buffer)
-(global-set-key [\C-\s-up] 'backward-up-list)
-(global-set-key [\C-\s-down] 'forward-list)
+;(global-set-key [M-C-up] 'forward-list)
+;(global-set-key [M-C-down] 'backward-up-list)
+;(global-set-key [M-up] 'beginning-of-defun)
+;(global-set-key [M-down] 'end-of-defun)
+;(global-set-key [\C-\s-up] 'backward-up-list)
+;(global-set-key [\C-\s-down] 'forward-list)
 (global-set-key "\C-x\C-x" 'buffer-menu)
 (global-set-key "\C-c\C-x" 'pretty-print-xml-region)
 (global-set-key [(control x) (k)] 'kill-this-buffer)
@@ -349,6 +363,7 @@
 (global-set-key (kbd "s-w") 'gid)
 (global-set-key (kbd "s-<left>")  'grep-a-lot-goto-prev)
 (global-set-key (kbd "s-<right>") 'grep-a-lot-goto-next)
+(global-set-key [s-tab] 'avy-goto-char-timer)
 ;;(global-set-key (kbd "s-c") 'string-inflection-lower-camelcase)
 ;;(global-set-key (kbd "s-g") 'simplenote2-sync-notes)
 
@@ -372,10 +387,15 @@
 
 (defun compile-lambda ()
   (interactive)
+  (setenv "PAN_BUILD_DIR"
+          (concat
+           (f-long(vc-root-dir))
+           )
+          )
   (let ((inhibit-read-only t)))
   (let ((default-directory
-          (concat default-directory "")))
-    (compile "usever saas; make")))
+          (concat (vc-root-dir) "src/apps/lambda")))
+    (compile "make")))
 
 ;; (defun compile-both-in-parent-directory ()
 ;;   (interactive)
@@ -461,7 +481,7 @@
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         )
-      ;(highlight-phrase myresult "hi-yellow")
+      ;;(highlight-phrase myresult "hi-yellow")
       )))
 
 (defun mygrep ()
@@ -477,7 +497,7 @@
     ;;(grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.\*\\( \\-\\-include='*.h' \\-\\-include='*.c' \\-\\-include='*.cpp' \\-\\-include='*.ovsschema' \\-\\-include='*.in' \\-\\-include='*.mib' | grep -B 1 '"  myresult "'")
     (grep (concat "find -cmin -9999999 | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( \\-\\-include='*' | grep -B 1 '"  myresult "'")
           )
-    ;(highlight-phrase myresult "hi-yellow")
+    ;;(highlight-phrase myresult "hi-yellow")
     ))
 
 (defun mygrep_file ()
@@ -492,7 +512,7 @@
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.\*\\( " (file-name-nondirectory (buffer-file-name)) " | grep -B 1 '"  myresult "'")
           )
-    ;(highlight-phrase myresult "hi-yellow")
+    ;;(highlight-phrase myresult "hi-yellow")
     ))
 
 ;; XML formatting
@@ -693,7 +713,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   "git-grep the entire current repo"
   (interactive (list (git-grep-prompt)))
   (grep-find (concat "git --no-pager grep -H -P -n --extended-regexp -I --break --show-function -e "
-                     (shell-quote-argument search)
+                     (shell-quote-argument (concat search ""))
                      " `git rev-parse --show-toplevel`")))
 
 (defun git-grep-local (search)
@@ -768,7 +788,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 ;           "go build -v && go test -v && go vet"))
   ; Godef jump key binding
   (setq indent-tabs-mode nil)
-  (smart-tab-mode nil)
   (local-set-key [f9]    'compile-go)
   (local-set-key [C-f9]  'run-go)
   (local-set-key "\M-g"  'go-guru-definition)
@@ -791,14 +810,14 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (elpy-enable)
 
 ;; Enable Flycheck
-(when (require 'flycheck nil t)
- (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-(add-hook 'elpy-mode-hook 'flycheck-mode))
+;(when (require 'flycheck nil t)
+; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+;(add-hook 'elpy-mode-hook 'flycheck-mode))
 
 ;;(add-hook 'python-mode-hook 'cscope-minor-mode)
 ;; Enable autopep8
-(require 'py-autopep8)
-(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+;(require 'py-autopep8)
+;(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
 
 (defun mygrep_cscope_def_all ()
   "grep function for grepint `xah-get-thing-at-cursor' "
@@ -819,7 +838,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         )
-      ;(highlight-phrase myresult "hi-yellow")
+      ;;(highlight-phrase myresult "hi-yellow")
       )))
 
 (add-hook 'python-mode-hook
@@ -830,10 +849,14 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             ;; (local-set-key "\s-g"      'cscope-find-global-definition)
             ;; (local-set-key "\s-f"      'cscope-find-this-file)
             ;; (local-set-key "\s-i"      'cscope-find-files-including-file)
-            (local-set-key (kbd "M-g") 'mygrep_cscope_def_all)
-            (local-set-key (kbd "S-f") 'beginning-of-defun)
-            (local-set-key (kbd "S-F") 'end-of-defun)
-            (local-set-key (kbd "M-p") 'pylint)
+            (local-set-key (kbd "M-g")    'mygrep_cscope_def_all)
+            (local-set-key (kbd "M-<up>") 'beginning-of-defun)
+            (local-set-key (kbd "M-<down>") 'end-of-defun)
+            (local-set-key [\C-\s-up] 'python-nav-backward-up-list)
+            (local-set-key [\C-\s-down] 'python-nav-forward-list)
+            (local-set-key (kbd "S-f")    'beginning-of-defun)
+            (local-set-key (kbd "S-F")    'end-of-defun)
+            (local-set-key (kbd "M-p")    'elpy-check)
             ;;(local-set-key (kbd "s-d") 'p4-diff)
             (local-set-key [f9]    'compile-lambda)
             )
@@ -898,7 +921,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
         )
-      ;(highlight-phrase myresult "hi-yellow")
+      ;;(highlight-phrase myresult "hi-yellow")
       )))
 
 (defun sudo-edit-current-file ()
@@ -933,4 +956,22 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 (defun test-func1 ()
   (interactive)
-  (message (concat "depth " (f-long(vc-root-dir)))))
+  (setenv "PAN_BUILD_DIR"
+          (concat
+           (f-long(vc-root-dir))
+           )
+          )
+  (message (getenv "PAN_BUILD_DIR"))
+  )
+
+
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
+
+(defun join-lines () (interactive)
+ (setq fill-column 100000)
+ (fill-paragraph nil)
+ (setq fill-column 78)
+)
