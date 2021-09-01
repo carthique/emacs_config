@@ -1,11 +1,14 @@
 (package-initialize)
-(defvar home_dir "/home/kashankar/" "home directory")
-(defconst font_size_mac 130 "mac monitor")
-(defconst font_size_ws 140 "wide screen monitor")
+(defvar home_dir "/Users/kashankar/" "home directory")
+(defconst font_size_mac 180 "mac monitor")
+(defconst font_size_ws 180 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 ;;(add-to-list 'load-path "~/.emacs.d/elpa/")
 ;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . dark)) 
+
 
 (setq inhibit-splash-screen t)         ; hide welcome screen
 (require 'package)
@@ -26,7 +29,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
+   '(helm helm-net flymake-python flymake-python-pyflakes lsp-pyright dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -65,8 +68,8 @@
              '("MELPA" .
                "http://melpa.milkbox.net/packages/"))
 
-(require 'p4)
-(require 'vc-p4)
+;(require 'p4)
+;(require 'vc-p4)
 (require 'thingatpt+)
 
 (use-package xah-get-thing :defer t)
@@ -90,10 +93,11 @@
 (use-package go-autocomplete :defer t)
 (use-package go-guru :defer t)
 (use-package flymake-go :defer t)
+(use-package flymake-python-pyflakes :defer t)
 (use-package go-eldoc :defer t)
 (use-package dockerfile-mode :defer t)
 (use-package elpy :defer t)
-;(use-package flycheck :defer t)
+(use-package flycheck :defer t)
 (use-package py-autopep8 :defer t)
 (use-package grep-a-lot :defer t)
 (use-package anzu :defer t)
@@ -103,6 +107,12 @@
 (use-package pylint :defer t)
 (use-package avy :defer t)
 (use-package sublimity :defer t)
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp))))  ; or lsp-deferred
+(use-package helm :defer t)
 
 (grep-a-lot-setup-keys)
 
@@ -128,10 +138,10 @@
 ;(setq mac-command-key-is-meta t)
 
 ;; the following 4 lines work on mac book 16
-;(setq mac-option-key-is-meta nil)
-;(setq mac-command-key-is-meta t)
-;(setq mac-command-modifier 'meta)
-;(setq mac-option-modifier 'super)
+(setq mac-option-key-is-meta nil)
+(setq mac-command-key-is-meta t)
+(setq mac-command-modifier 'meta)
+(setq mac-option-modifier 'super)
 
 ;; the following 4 lines used to work with newer emacs, maybe!
 ;;(setq mac-option-key-is-meta nil)
@@ -274,9 +284,10 @@
 
 
 ;; Function Key bindings
-(global-set-key [f1]    (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/todo.org"))))
-(global-set-key [C-f1]  (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/notepad.org"))))
-(global-set-key [M-f1]  'p4-opened)
+(global-set-key [M-f1]    (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/todo.org"))))
+;;(global-set-key [C-f1]  (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/notepad.org"))))
+(global-set-key [C-f1]  'p4-opened)
+(global-set-key [f1] 'my-helm-stackoverflow-lookup)
 ;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [f2]    'goto-line)
 (global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_ws)))
@@ -810,14 +821,14 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (elpy-enable)
 
 ;; Enable Flycheck
-;(when (require 'flycheck nil t)
-; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-;(add-hook 'elpy-mode-hook 'flycheck-mode))
+(when (require 'flycheck nil t)
+(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+(add-hook 'elpy-mode-hook 'flycheck-mode))
 
-;;(add-hook 'python-mode-hook 'cscope-minor-mode)
+(add-hook 'python-mode-hook 'cscope-minor-mode)
 ;; Enable autopep8
-;(require 'py-autopep8)
-;(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+(require 'py-autopep8)
+(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
 
 (defun mygrep_cscope_def_all ()
   "grep function for grepint `xah-get-thing-at-cursor' "
@@ -975,3 +986,30 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
  (fill-paragraph nil)
  (setq fill-column 78)
 )
+
+;;(advice-add 'anzu-mode :before #'test-file)
+
+;; install helm via packages and then:
+
+(require 'so)
+(require 'helm-net)
+(require 'cl)
+
+(defun my-helm-stackoverflow-lookup ()
+  (interactive)
+  ;; set debug-on-error to swallow potential network errors
+  (let ((debug-on-error t)
+        (helm-google-suggest-actions '(("Stackoverflow" . my-get-stackoverflow-answers))))
+    (helm-google-suggest)))
+
+(require 'git-mode)
+;;(add-to-list 'auto-mode-alist '(concat ("" "\\'") . git-mode))
+
+
+(when (fboundp 'git-mode)
+  (defun my-git-config ()
+    "For use in `git-mode-hook'."
+    (local-set-key (kbd "M-d") 'mygrep)
+    ;; more stuff here
+    )
+(add-hook 'git-mode-hook 'my-git-config))
