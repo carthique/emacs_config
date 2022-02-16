@@ -1,4 +1,5 @@
 (package-initialize)
+(setq package-native-compile t)
 (defvar home_dir "/Users/kashankar/" "home directory")
 (defconst font_size_mac 180 "mac monitor")
 (defconst font_size_ws 180 "wide screen monitor")
@@ -29,7 +30,9 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(helm helm-net flymake-python flymake-python-pyflakes lsp-pyright dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist)))
+   '(helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
+ '(warning-suppress-log-types '((comp) (comp)))
+ '(warning-suppress-types '((comp))))
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -92,12 +95,31 @@
 (use-package go-mode :defer t)
 (use-package go-autocomplete :defer t)
 (use-package go-guru :defer t)
-(use-package flymake-go :defer t)
-(use-package flymake-python-pyflakes :defer t)
+;;(use-package flymake-go :defer t)
+;;(use-package flymake-python-pyflakes :defer t)
 (use-package go-eldoc :defer t)
 (use-package dockerfile-mode :defer t)
-(use-package elpy :defer t)
-(use-package flycheck :defer t)
+;;(use-package elpy :defer t)
+;;(use-package flycheck :defer t)
+(use-package python
+  :mode ("\\.py" . python-mode)
+  :ensure t
+  :config
+  (flymake-mode) ;; <- This line makes the trick of disabling flymake in python mode!
+  (use-package elpy
+    :ensure t
+    :init
+    (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+    :config
+    (remove-hook 'elpy-modules 'elpy-module-flymake) ;; <- This removes flymake from elpy
+    (setq elpy-rpc-backend "jedi")
+    :bind (:map elpy-mode-map
+              ("M-." . elpy-goto-definition)
+              ("M-," . pop-tag-mark))
+  )
+  (elpy-enable)
+)
+
 (use-package py-autopep8 :defer t)
 (use-package grep-a-lot :defer t)
 (use-package anzu :defer t)
@@ -107,11 +129,25 @@
 (use-package pylint :defer t)
 (use-package avy :defer t)
 (use-package sublimity :defer t)
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp))))  ; or lsp-deferred
+(use-package company-tabnine :ensure t)
+(use-package k8s-mode :ensure t
+                      :hook (k8s-mode . yas-minor-mode))
+;(use-package lsp-pyright
+;  :ensure t
+;  :hook (python-mode . (lambda ()
+;                          (require 'lsp-pyright)
+;                          (lsp))))  ; or lsp-deferred
+
+(require 'k8s-mode)
+
+;;company-tabnine
+(require 'company-tabnine)
+(add-to-list 'company-backends #'company-tabnine)
+;; Trigger completion immediately.
+(setq company-idle-delay 0)
+;; Number the candidates (use M-1, M-2 etc to select completions).
+(setq company-show-numbers t)
+
 (use-package helm :defer t)
 
 (grep-a-lot-setup-keys)
@@ -301,7 +337,7 @@
 (global-set-key [f7]    'magit-log-buffer-file)
 (global-set-key [f8]    'magit-log-current)
 (global-set-key [M-f8]  'magit-log-all-branches)
-(global-set-key [f10]   (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/ut.org"))))
+;(global-set-key [f10]   (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/ut.org"))))
 (global-set-key [f11]   'match-paren)
 (global-set-key [f12]   'open-emacs-file)
 (global-set-key [M-f12] 'load-emacs)
@@ -340,8 +376,8 @@
 
 (setq dumb-jump-fallback-search nil)
 ;; Meta Key bindings
-(global-set-key "\M-s"      'git-grep)
-(global-set-key "\M-l"      'git-grep-local)
+(global-set-key "\M-s"      'mygrep_dir_all)
+(global-set-key "\M-l"      'mygrep-file)
 (global-set-key "\M-d"      'vc-diff)
 (global-set-key "\M-D"       'vc-root-diff)
 (global-set-key "\C-\M-d"   'magit-diff-range)
@@ -351,8 +387,8 @@
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
 ;; Super Key bindings
-(global-set-key (kbd "s-s") 'mygrep_dir_all)
-(global-set-key (kbd "s-f") 'mygrep_file)
+(global-set-key (kbd "s-s") 'git-grep)
+(global-set-key (kbd "s-f") 'git-grep-local)
 (global-set-key (kbd "s-d") 'mygrep)
 (global-set-key [s-down] 'next-error)
 (global-set-key [s-up] 'previous-error)
@@ -375,6 +411,7 @@
 (global-set-key (kbd "s-<left>")  'grep-a-lot-goto-prev)
 (global-set-key (kbd "s-<right>") 'grep-a-lot-goto-next)
 (global-set-key [s-tab] 'avy-goto-char-timer)
+(global-set-key (kbd "C-s-s") 'sudo-edit-current-file)
 ;;(global-set-key (kbd "s-c") 'string-inflection-lower-camelcase)
 ;;(global-set-key (kbd "s-g") 'simplenote2-sync-notes)
 
@@ -383,7 +420,6 @@
           (lambda () (local-set-key (kbd "C-d") 'diff-split-hunk)))
 
 (add-to-list 'auto-mode-alist '("\\.in\\'" . python-mode))
-;;(add-to-list 'company-backends #'company-tabnine)
 
 ;; Function Definitions
 (defun load-emacs ()
@@ -489,8 +525,8 @@
             (f-long(vc-root-dir))))
             ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
-          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
-        (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
+          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
+        (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
         )
       ;;(highlight-phrase myresult "hi-yellow")
       )))
@@ -506,7 +542,7 @@
                                 nil nil myresult))
     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
     ;;(grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.\*\\( \\-\\-include='*.h' \\-\\-include='*.c' \\-\\-include='*.cpp' \\-\\-include='*.ovsschema' \\-\\-include='*.in' \\-\\-include='*.mib' | grep -B 1 '"  myresult "'")
-    (grep (concat "find -cmin -9999999 | xargs grep -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( \\-\\-include='*' | grep -B 1 '"  myresult "'")
+    (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( \\-\\-include='*' | grep -B 1 '"  myresult "'")
           )
     ;;(highlight-phrase myresult "hi-yellow")
     ))
@@ -816,19 +852,19 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 ;;(add-hook 'go-mode-hook 'go-eldoc-setup)
 ;(setq leetcode-prefer-language "c")
 ;(setq leetcode-prefer-sql "mysql")
-(setq elpy-shell-use-project-root nil)
+;(setq elpy-shell-use-project-root nil)
 
-(elpy-enable)
+;;(elpy-enable)
 
 ;; Enable Flycheck
-(when (require 'flycheck nil t)
-(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-(add-hook 'elpy-mode-hook 'flycheck-mode))
+;;(when (require 'flycheck nil t)
+;;(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+;;(add-hook 'elpy-mode-hook 'flycheck-mode))
 
 (add-hook 'python-mode-hook 'cscope-minor-mode)
 ;; Enable autopep8
 (require 'py-autopep8)
-(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+;(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
 
 (defun mygrep_cscope_def_all ()
   "grep function for grepint `xah-get-thing-at-cursor' "
@@ -846,8 +882,8 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             (f-long(vc-root-dir))))
             ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
-          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
-        (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
+          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
+        (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
         )
       ;;(highlight-phrase myresult "hi-yellow")
       )))
@@ -870,6 +906,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             (local-set-key (kbd "M-p")    'elpy-check)
             ;;(local-set-key (kbd "s-d") 'p4-diff)
             (local-set-key [f9]    'compile-lambda)
+            (local-set-key [f10]   'elpy-check)
             )
           )
 
@@ -929,8 +966,8 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             (f-long(vc-root-dir))))
             ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
-          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
-        (grep (concat "find -cmin -9999999 | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w.\*\\( . | grep -B 1 '"  myresult "'"))
+          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
+        (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
         )
       ;;(highlight-phrase myresult "hi-yellow")
       )))
@@ -952,16 +989,17 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (defun prepare-tramp-sudo-string (tempfile)
   (if (file-remote-p tempfile)
       (let ((vec (tramp-dissect-file-name tempfile)))
-
         (tramp-make-tramp-file-name
          "sudo"
-         (tramp-file-name-user nil)
+         ""
+         (tramp-file-name-domain vec)
          (tramp-file-name-host vec)
+         (tramp-file-name-port vec)
          (tramp-file-name-localname vec)
-         (format "/ssh:%s@%s|"
+         (format "ssh:%s@%s|"
                  (tramp-file-name-user vec)
                  (tramp-file-name-host vec))))
-    (concat "/sudo:root@localhost:" tempfile)))
+    (concat "sudo::" tempfile)))
 
 (define-key dired-mode-map [s-return] 'sudo-edit-current-file)
 
@@ -1013,3 +1051,74 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     ;; more stuff here
     )
 (add-hook 'git-mode-hook 'my-git-config))
+(put 'narrow-to-region 'disabled nil)
+
+
+
+(autoload 'sgml-skip-tag-backward "sgml-mode" nil t)
+(autoload 'sgml-skip-tag-forward "sgml-mode" nil t)
+(defun html-get-tag ()
+  (let ((b (line-beginning-position))
+        (e (line-end-position))
+        (looping t)
+        (html-tag-char (string-to-char "<"))
+        (char (following-char))
+        (p (point))
+        (found_tag -1))
+
+    (save-excursion
+      ;; search backward
+      (unless (= char html-tag-char)
+        (while (and looping (<= b (point)) (not (= char 60)))
+          (setq char (following-char))
+          (setq p (point))
+          (if (= p (point-min))
+              ;; need get out of loop anyway
+              (setq looping nil)
+            (backward-char))))
+
+      ;; search forward
+      (if (not (= char html-tag-char))
+          (save-excursion
+            (while (and (>= e (point)) (not (= char 60)))
+              (setq char (following-char))
+              (setq p (point))
+              (forward-char))))
+
+      ;; is end tag?
+      (when (and (= char html-tag-char) (< p e))
+        (goto-char p)
+        (forward-char)
+        (if (= (following-char) 47)
+            (progn
+              ;; </
+              (skip-chars-forward "^>")
+              (forward-char)
+              (setq p (point))
+              (setq found_tag 1))
+          (progn
+            ;; < , looks fine
+            (backward-char)
+            (setq found_tag 0)))))
+    found_tag))
+
+(defun html-jump(&optional num)
+  "Jump forward from html open tag"
+  (interactive "P")
+  (unless num (setq num 1))
+  ;; web-mode-forward-sexp is assigned to forward-sexp-function
+  ;; it's buggy in web-mode v11, here is the workaround
+  (let ((backup-forward-sexp-function forward-sexp-function))
+    (if (= (html-get-tag) 0)
+        (sgml-skip-tag-forward num)
+      (sgml-skip-tag-backward num))))
+
+(define-key minibuffer-local-map
+  (kbd "<insert>")
+  (lambda ()
+    (interactive)
+    (if (string-match "[-a-z0-9 ]+$" (minibuffer-contents))
+        (mapc (lambda (char)
+                (push char unread-command-events))
+              (reverse (match-string 0 (minibuffer-contents)))))
+    (helm-minibuffer-history)))

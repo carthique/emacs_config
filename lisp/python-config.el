@@ -103,18 +103,18 @@
 
 ;; Language server for Python 
 ;; Read the docs for the different variables set in the config.
-(use-package lsp-pyright
-  :ensure t
-  :defer t
-  :config
-  (setq lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
-  (setq lsp-pyright-disable-language-service nil
-	lsp-pyright-disable-organize-imports nil
-	lsp-pyright-auto-import-completions t
-	lsp-pyright-use-library-code-for-types t
-	lsp-pyright-venv-path "~/miniconda3/envs")
-  :hook ((python-mode . (lambda () 
-                          (require 'lsp-pyright) (lsp-deferred)))))
+;; (use-package lsp-pyright
+;;   :ensure t
+;;   :defer t
+;;   :config
+;;   (setq lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
+;;   (setq lsp-pyright-disable-language-service nil
+;; 	lsp-pyright-disable-organize-imports nil
+;; 	lsp-pyright-auto-import-completions t
+;; 	lsp-pyright-use-library-code-for-types t
+;; 	lsp-pyright-venv-path "~/miniconda3/envs")
+;;   :hook ((python-mode . (lambda () 
+;;                           (require 'lsp-pyright) (lsp-deferred)))))
 
 ;; Format the python buffer following YAPF rules
 ;; There's also blacken if you like it better.
