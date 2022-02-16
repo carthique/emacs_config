@@ -1,12 +1,14 @@
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 (setq package-native-compile t)
 (defvar home_dir "/Users/kashankar/" "home directory")
 (defconst font_size_mac 180 "mac monitor")
 (defconst font_size_ws 180 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
-;;(add-to-list 'load-path "~/.emacs.d/elpa/")
-;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-;;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 (add-to-list 'default-frame-alist '(ns-appearance . dark)) 
 
@@ -33,9 +35,9 @@
    '(helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
  '(warning-suppress-log-types '((comp) (comp)))
  '(warning-suppress-types '((comp))))
-(add-to-list 'package-archives
-             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -67,9 +69,9 @@
 ;(set-face-attribute 'default nil :height font_size_ws)
 
 ;; Any add to list for package-archives (to add marmalade or melpa) goes here
-(add-to-list 'package-archives
-             '("MELPA" .
-               "http://melpa.milkbox.net/packages/"))
+;; (add-to-list 'package-archives
+;;              '("MELPA" .
+;;                "http://melpa.milkbox.net/packages/"))
 
 ;(require 'p4)
 ;(require 'vc-p4)

@@ -1,0 +1,2 @@
+;;; -*- no-byte-compile: t -*-
+(define-package "xah-replace-pairs" "20180508.249" "emacs lisp functions for multi-pair find/replace." '((emacs "24.1")) :commit "4d845cfbce32d45befd7c454e3476c3ce40d2b43" :keywords '("lisp" "tools" "find replace") :authors '(("Xah Lee ( http://xahlee.info/ )")) :maintainer '("Xah Lee ( http://xahlee.info/ )") :url "http://ergoemacs.org/emacs/elisp_replace_string_region.html")
