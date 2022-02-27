@@ -6,13 +6,14 @@
 (package-initialize)
 (setq package-native-compile t)
 (defvar home_dir "/Users/kashankar/" "home directory")
+(defvar org_notes (concat home_dir "notes/") "org notes directory")
 (defconst font_size_mac 180 "mac monitor")
 (defconst font_size_ws 180 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(add-to-list 'default-frame-alist '(ns-appearance . dark)) 
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
 
-
+(set-frame-font "MonoLisa 17" nil t)
 (setq inhibit-splash-screen t)         ; hide welcome screen
 (require 'package)
 (require 'xcscope)
@@ -46,6 +47,14 @@
 
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
+(setq backup-directory-alist
+      `((".*" . (concat home_dir ".saves"))))
+(setq auto-save-file-name-transforms
+      `((".*" (concat home_dir ".saves") t)))
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
 (defun fontify-frame (frame)
   (interactive)
@@ -151,6 +160,31 @@
 (setq company-show-numbers t)
 
 (use-package helm :defer t)
+;; (use-package ace-isearch :defer t)
+;; (global-ace-isearch-mode +1)
+;; (use-package isearch-symbol-at-point :defer t)
+;; (require 'isearch-symbol-at-point)
+(use-package minibuf-isearch :defer t)
+(use-package password-generator :defer t)
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory (file-truename org_notes))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dai[[id:3A0BBC11-A3B6-40D3-8C84-DC03D37E3CC2][Deault]]lies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
+
+
 
 (grep-a-lot-setup-keys)
 
@@ -322,14 +356,14 @@
 
 
 ;; Function Key bindings
-(global-set-key [M-f1]    (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/todo.org"))))
-;;(global-set-key [C-f1]  (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/notepad.org"))))
+(global-set-key [M-f1]    (lambda() (interactive)(find-file (concat org_notes "todo.org"))))
+;;(global-set-key [C-f1]  (lambda() (interactive)(find-file (concat org_notes "notepad.org"))))
 (global-set-key [C-f1]  'p4-opened)
 (global-set-key [f1] 'my-helm-stackoverflow-lookup)
 ;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [f2]    'goto-line)
-(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_ws)))
-(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_mac)))
+;(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_ws)))
+;(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_mac)))
 (global-set-key [f3]    'magit-status)
 (global-set-key [f4]    'magit-show-refs)
 (global-set-key [f5]    'my-revert-buffer)
@@ -597,7 +631,7 @@ by using nxml's indentation rules."
 (setf org-make-link-description-function #'org-link-describe)
 
 (defvar *org-email-todo-tree-header* "*** Coding TODOS")
-(defvar *org-email-todo-list-buffer* (concat home_dir "backup/scratchpad/todo.org"))
+(defvar *org-email-todo-list-buffer* (concat org_notes "todo.org"))
 
 (defun org-insert-email-as-current-todo ()
   (interactive)
