@@ -6,10 +6,11 @@
 (package-initialize)
 (setq package-native-compile t)
 (defvar home_dir "/Users/kashankar/" "home directory")
-(defvar org_notes (concat home_dir "notes/") "org notes directory")
+(defvar org_notes (concat home_dir "Documents/notes/") "org notes directory")
 (defconst font_size_mac 180 "mac monitor")
 (defconst font_size_ws 180 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
+;(add-to-list 'load-path "~/.emacs.d/lisp/kubectl")
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 (add-to-list 'default-frame-alist '(ns-appearance . dark))
 
@@ -17,6 +18,8 @@
 (setq inhibit-splash-screen t)         ; hide welcome screen
 (require 'package)
 (require 'xcscope)
+;;(require 'transient)
+;(require 'kubectl)
 (require 'f)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -33,7 +36,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
+   '(kubernetes-tramp helm-projectile projectile org-roam-ui websocket helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
  '(warning-suppress-log-types '((comp) (comp)))
  '(warning-suppress-types '((comp))))
 ;; (add-to-list 'package-archives
@@ -170,20 +173,42 @@
   :ensure t
   :custom
   (org-roam-directory (file-truename org_notes))
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
+  :bind (("C-x n l" . org-roam-buffer-toggle)
+         ("C-x n f" . org-roam-node-find)
+         ("C-x n g" . org-roam-graph)
+         ("C-x n i" . org-roam-node-insert)
+         ("C-x n c" . org-roam-capture)
          ;; Dai[[id:3A0BBC11-A3B6-40D3-8C84-DC03D37E3CC2][Deault]]lies
-         ("C-c n j" . org-roam-dailies-capture-today))
+         ("C-x n j" . org-roam-dailies-capture-today))
   :config
   ;; If you're using a vertical completion framework, you might want a more informative completion interface
   (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
   (require 'org-roam-protocol))
-
+(use-package websocket
+  :after org-roam)
+(use-package go-mode :defer t)
+(use-package projectile
+  :defer t
+  :config
+  (define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
+  (projectile-mode +1))
+(use-package helm-projectile
+  :defer t
+  :config
+  (helm-projectile-on))
+(use-package org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 
 
 (grep-a-lot-setup-keys)
@@ -356,9 +381,8 @@
 
 
 ;; Function Key bindings
-(global-set-key [M-f1]    (lambda() (interactive)(find-file (concat org_notes "todo.org"))))
-;;(global-set-key [C-f1]  (lambda() (interactive)(find-file (concat org_notes "notepad.org"))))
-(global-set-key [C-f1]  'p4-opened)
+(global-set-key [M-f1]    (lambda() (interactive)(find-file (concat org_notes "20220226232342-default.org"))))
+;(global-set-key [C-f1]    'p4-opened)
 (global-set-key [f1] 'my-helm-stackoverflow-lookup)
 ;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [f2]    'goto-line)
@@ -373,6 +397,7 @@
 (global-set-key [f7]    'magit-log-buffer-file)
 (global-set-key [f8]    'magit-log-current)
 (global-set-key [M-f8]  'magit-log-all-branches)
+(global-set-key [f9]    'org-roam-node-find)
 ;(global-set-key [f10]   (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/ut.org"))))
 (global-set-key [f11]   'match-paren)
 (global-set-key [f12]   'open-emacs-file)
@@ -631,7 +656,7 @@ by using nxml's indentation rules."
 (setf org-make-link-description-function #'org-link-describe)
 
 (defvar *org-email-todo-tree-header* "*** Coding TODOS")
-(defvar *org-email-todo-list-buffer* (concat org_notes "todo.org"))
+(defvar *org-email-todo-list-buffer* (concat org_notes "20220226232342-default.org"))
 
 (defun org-insert-email-as-current-todo ()
   (interactive)
@@ -642,7 +667,7 @@ by using nxml's indentation rules."
       (let ((point (re-search-forward *org-email-todo-tree-header* (point-max) 
                                       nil)))
         (org-end-of-subtree t)
-        (insert "\n** TODO -- ")
+        (insert "\n- [ ] -- ")
         (insert link))))
   (org-save-all-org-buffers)
   (message "Saved."))
@@ -845,6 +870,10 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 (setenv "GOPATH" "/Users/carthique/go/bin")
 (add-to-list 'exec-path "/Users/carthique/go/bin")
+(add-to-list 'load-path "/place/where/you/put/it/")
+(autoload 'go-mode "go-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+(add-hook 'go-mode-hook 'lsp-deferred)
 
 (defun compile-go ()
   (interactive)
@@ -870,7 +899,8 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 ;      (set (make-local-variable 'compile-command)
 ;           "go build -v && go test -v && go vet"))
   ; Godef jump key binding
-  (setq indent-tabs-mode nil)
+  (setq indent-tabs-mode t)
+  (tab-width 4)
   (local-set-key [f9]    'compile-go)
   (local-set-key [C-f9]  'run-go)
   (local-set-key "\M-g"  'go-guru-definition)
@@ -927,6 +957,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (add-hook 'python-mode-hook
           (lambda ()
             (cscope-minor-mode)
+            (setq indent-tabs-mode nil)
             (local-set-key (kbd "M-b")  'org-insert-email-as-current-todo)
             ;; (local-set-key "\s-s"      'cscope-find-this-symbol)
             ;; (local-set-key "\s-g"      'cscope-find-global-definition)
@@ -1158,3 +1189,12 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
                 (push char unread-command-events))
               (reverse (match-string 0 (minibuffer-contents)))))
     (helm-minibuffer-history)))
+
+
+
+(use-package kubernetes
+  :ensure t
+  :commands (kubernetes-overview)
+  :config)
+  ;;(setq kubernetes-poll-frequency 3600
+        ;;kubernetes-redraw-frequency 3600))
