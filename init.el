@@ -6,9 +6,9 @@
 (package-initialize)
 (setq package-native-compile t)
 (defvar home_dir "/Users/kashankar/" "home directory")
-(defvar org_notes (concat home_dir "Documents/notes/") "org notes directory")
-(defconst font_size_mac 180 "mac monitor")
-(defconst font_size_ws 180 "wide screen monitor")
+(defvar org-directory (concat home_dir "Documents/notes/") "org notes directory")
+(defconst font_size_mac 250 "mac monitor")
+(defconst font_size_ws 250 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 ;(add-to-list 'load-path "~/.emacs.d/lisp/kubectl")
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
@@ -36,7 +36,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(kubernetes-tramp helm-projectile projectile org-roam-ui websocket helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
+   '(python-pytest pytest org-bullets kubernetes-tramp helm-projectile projectile org-roam-ui websocket helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
  '(warning-suppress-log-types '((comp) (comp)))
  '(warning-suppress-types '((comp))))
 ;; (add-to-list 'package-archives
@@ -146,6 +146,8 @@
 (use-package company-tabnine :ensure t)
 (use-package k8s-mode :ensure t
                       :hook (k8s-mode . yas-minor-mode))
+(use-package pytest :ensure t)
+(use-package python-pytest :ensure t)
 ;(use-package lsp-pyright
 ;  :ensure t
 ;  :hook (python-mode . (lambda ()
@@ -153,6 +155,8 @@
 ;                          (lsp))))  ; or lsp-deferred
 
 (require 'k8s-mode)
+(require 'pytest)
+(require 'python-pytest)
 
 ;;company-tabnine
 (require 'company-tabnine)
@@ -169,23 +173,41 @@
 ;; (require 'isearch-symbol-at-point)
 (use-package minibuf-isearch :defer t)
 (use-package password-generator :defer t)
+(use-package org-bullets :defer t)
 (use-package org-roam
-  :ensure t
+  :after org
+  :init (setq org-roam-v2-ack t) ;; Acknowledge V2 upgrade
   :custom
-  (org-roam-directory (file-truename org_notes))
-  :bind (("C-x n l" . org-roam-buffer-toggle)
-         ("C-x n f" . org-roam-node-find)
-         ("C-x n g" . org-roam-graph)
-         ("C-x n i" . org-roam-node-insert)
-         ("C-x n c" . org-roam-capture)
-         ;; Dai[[id:3A0BBC11-A3B6-40D3-8C84-DC03D37E3CC2][Deault]]lies
-         ("C-x n j" . org-roam-dailies-capture-today))
+  (org-roam-directory (file-truename org-directory))
   :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
+  (org-roam-setup)
+  :bind (("C-x n f" . org-roam-node-find)
+         ("C-x n r" . org-roam-node-random)
+         (:map org-mode-map
+               (("C-x n i" . org-roam-node-insert)
+                ("C-x n c" . org-id-get-create)
+                ("C-x n t" . org-roam-tag-add)
+                ("C-x n a" . org-roam-alias-add)
+                ("C-x n l" . org-roam-buffer-toggle)))))
+;; (use-package org-roam
+;;   :ensure t
+;;   :custom
+;;   (org-roam-directory (file-truename org_notes))
+;;   :bind (("C-x n l" . org-roam-buffer-toggle)
+;;          ("C-x n f" . org-roam-node-find)
+;;          ("C-x n g" . org-roam-graph)
+;;          ("C-x n i" . org-roam-node-insert)
+;;          ("C-x n c" . org-roam-capture)
+;;          ;; Dai[[id:3A0BBC11-A3B6-40D3-8C84-DC03D37E3CC2][Deault]]lies
+;;          ("C-x n j" . org-roam-dailies-capture-today))
+;;   :config
+;;   ;; If you're using a vertical completion framework, you might want a more informative completion interface
+;;   (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+;;   (org-roam-db-autosync-mode)
+;;   ;; If using org-roam-protocol
+;;   (require 'org-roam-protocol))
+(add-hook 'org-mode-hook #'org-bullets-mode)
+
 (use-package websocket
   :after org-roam)
 (use-package go-mode :defer t)
@@ -381,7 +403,8 @@
 
 
 ;; Function Key bindings
-(global-set-key [M-f1]    (lambda() (interactive)(find-file (concat org_notes "20220226232342-default.org"))))
+(global-set-key [M-f1]    (lambda() (interactive)(find-file (concat org-directory "20220610135225-default.org"))))
+(global-set-key [M-f2]    (lambda() (interactive)(find-file (concat org-directory "20221011202643-todos.org"))))
 ;(global-set-key [C-f1]    'p4-opened)
 (global-set-key [f1] 'my-helm-stackoverflow-lookup)
 ;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
@@ -408,6 +431,7 @@
 ;(global-set-key (kbd "M-<up>") 'beginning-of-defun)
 ;(global-set-key (kbd "M-<down>") 'end-of-defun)
 ;(global-set-key (kbd "C-a") 'mark-whole-buffer)
+(global-set-key [s-f1] 'org-roam-dailies-find-today)
 
 (global-set-key (kbd "M-0") 'magit-refs-ws0)
 (global-set-key (kbd "M-1") 'magit-refs-ws1)
@@ -475,6 +499,9 @@
 (global-set-key (kbd "C-s-s") 'sudo-edit-current-file)
 ;;(global-set-key (kbd "s-c") 'string-inflection-lower-camelcase)
 ;;(global-set-key (kbd "s-g") 'simplenote2-sync-notes)
+(global-set-key (kbd "M-s-t") 'org-roam-dailies-goto-today)
+(global-set-key (kbd "M-s-p") 'org-roam-dailies-goto-yesterday)
+(global-set-key (kbd "M-s-n") 'org-roam-dailies-goto-tomorrow)
 
 ;;Diff mode hooks
 (add-hook 'diff-mode-hook
@@ -587,7 +614,7 @@
             ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
-        (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
+        (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal --exclude-dir=tests -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
         )
       ;;(highlight-phrase myresult "hi-yellow")
       )))
@@ -656,7 +683,7 @@ by using nxml's indentation rules."
 (setf org-make-link-description-function #'org-link-describe)
 
 (defvar *org-email-todo-tree-header* "*** Coding TODOS")
-(defvar *org-email-todo-list-buffer* (concat org_notes "20220226232342-default.org"))
+(defvar *org-email-todo-list-buffer* (concat org-directory "20220610135225-default.org"))
 
 (defun org-insert-email-as-current-todo ()
   (interactive)
@@ -868,8 +895,9 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 (when window-system (set-exec-path-from-shell-PATH))
 
-(setenv "GOPATH" "/Users/carthique/go/bin")
-(add-to-list 'exec-path "/Users/carthique/go/bin")
+(setenv "GOPATH" "/Users/kashankar/go/bin")
+(setenv "PYTHONPATH" "/Users/kashankar/pan/ws1/saas-infra/src/apps/orchestrator/")
+(add-to-list 'exec-path "/Users/kashankar/go/bin")
 (add-to-list 'load-path "/place/where/you/put/it/")
 (autoload 'go-mode "go-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
@@ -1198,3 +1226,96 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   :config)
   ;;(setq kubernetes-poll-frequency 3600
         ;;kubernetes-redraw-frequency 3600))
+
+
+
+ (setq org-latex-pdf-process
+          '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
+
+
+    (unless (boundp 'org-latex-classes)
+      (setq org-latex-classes nil))
+
+    (add-to-list 'org-latex-classes
+                 '("ethz"
+                   "\\documentclass[a4paper,11pt,titlepage]{memoir}
+    \\usepackage[utf8]{inputenc}
+    \\usepackage[T1]{fontenc}
+    \\usepackage{fixltx2e}
+    \\usepackage{graphicx}
+    \\usepackage{longtable}
+    \\usepackage{float}
+    \\usepackage{wrapfig}
+    \\usepackage{rotating}
+    \\usepackage[normalem]{ulem}
+    \\usepackage{amsmath}
+    \\usepackage{textcomp}
+    \\usepackage{marvosym}
+    \\usepackage{wasysym}
+    \\usepackage{amssymb}
+    \\usepackage{hyperref}
+    \\usepackage{mathpazo}
+    \\usepackage{color}
+    \\usepackage{enumerate}
+    \\definecolor{bg}{rgb}{0.95,0.95,0.95}
+    \\tolerance=1000
+          [NO-DEFAULT-PACKAGES]
+          [PACKAGES]
+          [EXTRA]
+    \\linespread{1.1}
+    \\hypersetup{pdfborder=0 0 0}"
+                   ("\\chapter{%s}" . "\\chapter*{%s}")
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+
+    (add-to-list 'org-latex-classes
+                 '("article"
+                   "\\documentclass[11pt,a4paper]{article}
+    \\usepackage[utf8]{inputenc}
+    \\usepackage[T1]{fontenc}
+    \\usepackage{fixltx2e}
+    \\usepackage{graphicx}
+    \\usepackage{longtable}
+    \\usepackage{float}
+    \\usepackage{wrapfig}
+    \\usepackage{rotating}
+    \\usepackage[normalem]{ulem}
+    \\usepackage{amsmath}
+    \\usepackage{textcomp}
+    \\usepackage{marvosym}
+    \\usepackage{wasysym}
+    \\usepackage{amssymb}
+    \\usepackage{hyperref}
+    \\usepackage{mathpazo}
+    \\usepackage{color}
+    \\usepackage{enumerate}
+    \\definecolor{bg}{rgb}{0.95,0.95,0.95}
+    \\tolerance=1000
+          [NO-DEFAULT-PACKAGES]
+          [PACKAGES]
+          [EXTRA]
+    \\linespread{1.1}
+    \\hypersetup{pdfborder=0 0 0}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+
+
+    (add-to-list 'org-latex-classes '("ebook"
+                                      "\\documentclass[11pt, oneside]{memoir}
+    \\setstocksize{9in}{6in}
+    \\settrimmedsize{\\stockheight}{\\stockwidth}{*}
+    \\setlrmarginsandblock{2cm}{2cm}{*} % Left and right margin
+    \\setulmarginsandblock{2cm}{2cm}{*} % Upper and lower margin
+    \\checkandfixthelayout
+    % Much more laTeX code omitted
+    "
+                                      ("\\chapter{%s}" . "\\chapter*{%s}")
+                                      ("\\section{%s}" . "\\section*{%s}")
+                                      ("\\subsection{%s}" . "\\subsection*{%s}")))
