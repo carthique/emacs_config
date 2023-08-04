@@ -33,7 +33,7 @@
 ;; calls to `defsetf' when support for earlier versions is dropped.
 (eval-when-compile
   (unless (fboundp 'gv-define-setter)
-    (require 'cl)))
+    (require 'cl-lib)))
 
 (defgroup dash ()
   "Customize group for Dash, a modern list library."

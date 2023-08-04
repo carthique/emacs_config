@@ -1,22 +1,21 @@
 (require 'package)
+(setq server-quiet t)
+(setq warning-minimum-level :emergency)
+(setq byte-compile-warnings '(cl-functions))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 (setq package-native-compile t)
+(require 'package)
+
 (defvar home_dir "/Users/kashankar/" "home directory")
 (defvar org-directory (concat home_dir "Documents/notes/") "org notes directory")
-(defconst font_size_mac 250 "mac monitor")
-(defconst font_size_ws 250 "wide screen monitor")
+;(defconst font_size_mac 250 "mac monitor")
+;(defconst font_size_ws 250 "wide screen monitor")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
-;(add-to-list 'load-path "~/.emacs.d/lisp/kubectl")
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(add-to-list 'default-frame-alist '(ns-appearance . dark))
-
-(set-frame-font "MonoLisa 17" nil t)
 (setq inhibit-splash-screen t)         ; hide welcome screen
-(require 'package)
 (require 'xcscope)
 ;;(require 'transient)
 ;(require 'kubectl)
@@ -36,7 +35,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(python-pytest pytest org-bullets kubernetes-tramp helm-projectile projectile org-roam-ui websocket helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
+   '(lsp-mode python-pytest pytest org-bullets kubernetes-tramp helm-projectile projectile org-roam-ui websocket helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
  '(warning-suppress-log-types '((comp) (comp)))
  '(warning-suppress-types '((comp))))
 ;; (add-to-list 'package-archives
@@ -59,22 +58,23 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
-(defun fontify-frame (frame)
-  (interactive)
-  (if window-system
-      (progn
-        (if (> (x-display-pixel-height) 1440)
-            (set-face-attribute 'default nil :height font_size_ws)
-         (set-face-attribute 'default nil :height font_size_mac)))))
+;; (defun fontify-frame (frame)
+;;   (interactive)
+;;   (if window-system
+;;       (progn
+;;         (if (> (x-display-pixel-height) 1440)
+;;             (set-face-attribute 'default nil :height font_size_ws)
+;;          (set-face-attribute 'default nil :height font_size_mac)))))
 
-;; Fontify current frame
-(fontify-frame nil)
+;; ;; Fontify current frame
+;; (fontify-frame nil)
 
 ;; Fontify any future frames
 ;;(push 'fontify-frame after-make-frame-functions)
+;; Set default font size to 16
+
 
 (setq x-select-request-type 'STRING)
-;;(add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
 ;(run-with-idle-timer 0.1 nil 'toggle-fullscreen)
 (set-cursor-color "#ffffff")
@@ -89,9 +89,10 @@
 ;(require 'vc-p4)
 (require 'thingatpt+)
 
+;; Start of base packages
 (use-package xah-get-thing :defer t)
 (require 'xah-get-thing)
-;; Enable emacs package manager
+;; Enable base emacs packages
 (use-package thingatpt :defer t)
 (use-package xah-replace-pairs :defer t)
 (use-package desktop :defer t)
@@ -106,71 +107,36 @@
 (use-package rainbow-delimiters :defer t)
 (use-package dumb-jump :defer t)
 (use-package wgrep :defer t)
-(use-package go-mode :defer t)
-(use-package go-autocomplete :defer t)
-(use-package go-guru :defer t)
-;;(use-package flymake-go :defer t)
-;;(use-package flymake-python-pyflakes :defer t)
-(use-package go-eldoc :defer t)
-(use-package dockerfile-mode :defer t)
-;;(use-package elpy :defer t)
-;;(use-package flycheck :defer t)
-(use-package python
-  :mode ("\\.py" . python-mode)
-  :ensure t
-  :config
-  (flymake-mode) ;; <- This line makes the trick of disabling flymake in python mode!
-  (use-package elpy
-    :ensure t
-    :init
-    (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
-    :config
-    (remove-hook 'elpy-modules 'elpy-module-flymake) ;; <- This removes flymake from elpy
-    (setq elpy-rpc-backend "jedi")
-    :bind (:map elpy-mode-map
-              ("M-." . elpy-goto-definition)
-              ("M-," . pop-tag-mark))
-  )
-  (elpy-enable)
-)
-
-(use-package py-autopep8 :defer t)
 (use-package grep-a-lot :defer t)
 (use-package anzu :defer t)
 (use-package magit :defer t)
 (use-package docker :defer t)
-(use-package blacken :defer t)
-(use-package pylint :defer t)
-(use-package avy :defer t)
-(use-package sublimity :defer t)
-(use-package company-tabnine :ensure t)
+(use-package helm :defer t)
+(setq yas-verbosity 1)
 (use-package k8s-mode :ensure t
                       :hook (k8s-mode . yas-minor-mode))
-(use-package pytest :ensure t)
-(use-package python-pytest :ensure t)
-;(use-package lsp-pyright
-;  :ensure t
-;  :hook (python-mode . (lambda ()
-;                          (require 'lsp-pyright)
-;                          (lsp))))  ; or lsp-deferred
-
-(require 'k8s-mode)
-(require 'pytest)
-(require 'python-pytest)
-
-;;company-tabnine
-(require 'company-tabnine)
-(add-to-list 'company-backends #'company-tabnine)
-;; Trigger completion immediately.
-(setq company-idle-delay 0)
-;; Number the candidates (use M-1, M-2 etc to select completions).
-(setq company-show-numbers t)
-
-(use-package helm :defer t)
-;; (use-package ace-isearch :defer t)
-;; (global-ace-isearch-mode +1)
-;; (use-package isearch-symbol-at-point :defer t)
-;; (require 'isearch-symbol-at-point)
+(use-package websocket
+  :after org-roam)
+(use-package projectile
+  :defer t
+  :config
+  (define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
+  (projectile-mode +1))
+(use-package helm-projectile
+  :defer t
+  :config
+  (helm-projectile-on))
+(use-package org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 (use-package minibuf-isearch :defer t)
 (use-package password-generator :defer t)
 (use-package org-bullets :defer t)
@@ -206,48 +172,35 @@
 ;;   (org-roam-db-autosync-mode)
 ;;   ;; If using org-roam-protocol
 ;;   (require 'org-roam-protocol))
-(add-hook 'org-mode-hook #'org-bullets-mode)
-
-(use-package websocket
-  :after org-roam)
-(use-package go-mode :defer t)
-(use-package projectile
-  :defer t
+(use-package kubernetes
+  :ensure t
+  :commands (kubernetes-overview)
+  :config)
+  ;;(setq kubernetes-poll-frequency 3600
+        ;;kubernetes-redraw-frequency 3600))
+(use-package exec-path-from-shell
+  :ensure t
   :config
-  (define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
-  (projectile-mode +1))
-(use-package helm-projectile
-  :defer t
-  :config
-  (helm-projectile-on))
-(use-package org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
+  (custom-set-variables
+ '(exec-path-from-shell-arguments '("-c")))
+  (exec-path-from-shell-initialize))
+;; End of base packages
 
+;; (setq gc-cons-threshold (* 100 1024 1024))
+;; (setq read-process-output-max (* 1024 1024)) ; 1 MB
+(setenv "PYTHONPATH" "/Users/kashankar/code/patches:/Users/kashankar/code/saas-infra/src/apps/orchestrator:/Users/kashankar/code/saas-infra/src/apps/lambda")
+;;(setenv "PATH" "/Users/kashankar/.pyenv/shims:/Users/kashankar/bin:/usr/local/bin:/Users/kashankar/.local/bin:/Users/kashankar/bin:/usr/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin")
+(setq python-shell-extra-pythonpaths '("/Users/kashankar/code/saas-infra/src/apps/orchestrator/:/Users/kashankar/code/saas-infra/src/apps/lambda"))
+(setenv "AWS_REGION" "us-west-2") 
 
-(grep-a-lot-setup-keys)
+(require 'k8s-mode)
+;;(require 'company-tabnine)
 
-(avy-setup-default)
-(global-set-key (kbd "C-c C-j") 'avy-resume)
+;;Appearance and Functionality
+(set-face-font 'default "MonoLisa")
+(set-face-attribute 'default nil :height 180)
 
-
-(autoload 'pylint "pylint")
-(add-hook 'python-mode-hook 'pylint-add-menu-items)
-(add-hook 'python-mode-hook 'pylint-add-key-bindings)
-
-
-(autoload 'gid "idutils" nil t)
-;(ac-config-default)
-
-
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 ;Make sure the following VNC settings are on
 ; - Do not send special keys
 ; - Set Options keys to Super_L
@@ -267,7 +220,6 @@
 ;;(setq mac-command-key-is-meta t)
 ;;(setq mac-command-modifier 'control)
 ;;(setq mac-option-modifier 'super)
-
 
 ;;; No Menubar, Toolbar and Scrollbar
 (setq kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions))
@@ -333,6 +285,121 @@
 (global-auto-revert-mode) 1
 ;; auto refresh dired when file changes
 (add-hook 'dired-mode-hook 'auto-revert-mode)
+;;Show number of matches in mode-line while searching
+(global-anzu-mode +1)
+;; Smart tabs
+(global-smart-tab-mode 1)
+;; Themes
+;;(load-theme 'material t)
+;;(load-theme 'dark-laptop t)
+(load-theme 'zenburn t)
+(add-hook 'org-mode-hook #'org-bullets-mode)
+
+;; (use-package lsp-mode
+;;   :hook (python-mode . lsp-deferred)
+;;   :commands (lsp lsp-deferred)
+;;   :config
+;;   (setq lsp-pyls-server-command "pylsp")
+;;   (setq lsp-idle-delay 0.500)
+;;   (setq lsp-python-ms-executable "/Users/kashankar/.pyenv/shims/pylsp"))
+
+
+;; (require 'lsp-mode)
+;; (add-hook 'python-mode-hook #'lsp-deferred)
+;; (setq lsp-pylance-server-command '("pylance-language-server"))
+;; (setq lsp-root-uri (concat "file://" (expand-file-name "/Users/kashankar/code/saas-infra")))
+
+;(use-package lsp-pyright
+;  :ensure t
+;  :hook (python-mode . (lambda ()
+;                          (require 'lsp-pyright)
+;                          (lsp))))  ; or lsp-deferred
+
+;(add-hook 'go-mode-hook 'lsp-deferred)
+
+; PDB
+;; Define a function to insert the pdb code snippet
+(defun insert-pdb-debugger ()
+  "Insert the pdb debug code snippet."
+  (interactive)
+  (insert "import pdb; pdb.set_trace()"))
+
+;; Define a keyboard shortcut for the function
+(global-set-key [s-f2] 'insert-pdb-debugger)
+
+
+(use-package go-mode :defer t)
+(use-package go-autocomplete :defer t)
+(use-package go-guru :defer t)
+(use-package flymake
+  :ensure t
+  :config
+  (setq-default flymake-diagnostic-functions nil
+                flymake-highlight-line nil
+                flymake-start-on-flymake-mode nil))
+;;(use-package flymake-go :defer t)
+;;(use-package flymake-python-pyflakes :defer t)
+(use-package go-eldoc :defer t)
+(use-package dockerfile-mode :defer t)
+(use-package elpy :defer t)
+;;(use-package flycheck :defer t)
+;;(setq elpy-rpc-python-command "/Users/kashankar/.pyenv/shims/python")
+(use-package python
+  :mode ("\\.py" . python-mode)
+  :ensure t
+  :config
+  (flymake-mode) ;; <- This line makes the trick of disabling flymake in python mode!
+  (use-package elpy
+    :ensure t
+    :init
+    (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+    :config
+    (remove-hook 'elpy-modules 'elpy-module-flymake) ;; <- This removes flymake from elpy
+    (setq elpy-rpc-backend "jedi")
+    :bind (:map elpy-mode-map
+              ("M-." . elpy-goto-definition)
+              ("M-," . pop-tag-mark))
+  )
+  (elpy-enable)
+)
+
+(use-package py-autopep8 :defer t)
+(use-package blacken :defer t)
+(use-package pylint :defer t)
+(use-package avy :defer t)
+(use-package sublimity :defer t)
+;;(use-package company-tabnine :ensure t)
+(use-package pytest :ensure t)
+(use-package python-pytest :ensure t)
+;;company-tabnine
+;;(add-to-list 'company-backends #'company-tabnine)
+;; Trigger completion immediately.
+(setq company-idle-delay 0)
+;; Number the candidates (use M-1, M-2 etc to select completions).
+(setq company-show-numbers t)
+;;Diff mode hooks
+(add-hook 'diff-mode-hook
+          (lambda () (local-set-key (kbd "C-d") 'diff-split-hunk)))
+
+;; Python
+;; (use-package ace-isearch :defer t)
+;; (global-ace-isearch-mode +1)
+;; (use-package isearch-symbol-at-point :defer t)
+;; (require 'isearch-symbol-at-point)
+
+(grep-a-lot-setup-keys)
+
+(avy-setup-default)
+(global-set-key (kbd "C-c C-j") 'avy-resume)
+
+(autoload 'pylint "pylint")
+(add-hook 'python-mode-hook 'pylint-add-menu-items)
+(add-hook 'python-mode-hook 'pylint-add-key-bindings)
+(add-to-list 'auto-mode-alist '("\\.in\\'" . python-mode))
+
+
+(autoload 'gid "idutils" nil t)
+;(ac-config-default)
 
 ;;Sudo dired support
 (define-key dired-mode-map (kbd "C-c C-r") 'dired-toggle-sudo)
@@ -373,16 +440,6 @@
             (c-set-offset 'case-label '+)))
 ;;(add-hook 'c-mode-hook 'cscope-minor-mode)
 
-;;Show number of matches in mode-line while searching
-(global-anzu-mode +1)
-
-;; Smart tabs
-(global-smart-tab-mode 1)
-
-;; Themes
-;;(load-theme 'material t)
-;;(load-theme 'dark-laptop t)
-(load-theme 'zenburn t)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -422,7 +479,7 @@
 (global-set-key [M-f8]  'magit-log-all-branches)
 (global-set-key [f9]    'org-roam-node-find)
 ;(global-set-key [f10]   (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/ut.org"))))
-(global-set-key [f11]   'match-paren)
+(global-set-key [M-f11]   'match-paren)
 (global-set-key [f12]   'open-emacs-file)
 (global-set-key [M-f12] 'load-emacs)
 (global-set-key [f13]  'open-log-file)
@@ -431,7 +488,10 @@
 ;(global-set-key (kbd "M-<up>") 'beginning-of-defun)
 ;(global-set-key (kbd "M-<down>") 'end-of-defun)
 ;(global-set-key (kbd "C-a") 'mark-whole-buffer)
-(global-set-key [s-f1] 'org-roam-dailies-find-today)
+(global-set-key [f11] 'org-roam-dailies-goto-today)
+(global-set-key [M-f11] 'org-roam-dailies-goto-tomorrow)
+(global-set-key [C-f11] 'org-roam-dailies-goto-yesterday)
+
 
 (global-set-key (kbd "M-0") 'magit-refs-ws0)
 (global-set-key (kbd "M-1") 'magit-refs-ws1)
@@ -499,15 +559,7 @@
 (global-set-key (kbd "C-s-s") 'sudo-edit-current-file)
 ;;(global-set-key (kbd "s-c") 'string-inflection-lower-camelcase)
 ;;(global-set-key (kbd "s-g") 'simplenote2-sync-notes)
-(global-set-key (kbd "M-s-t") 'org-roam-dailies-goto-today)
-(global-set-key (kbd "M-s-p") 'org-roam-dailies-goto-yesterday)
-(global-set-key (kbd "M-s-n") 'org-roam-dailies-goto-tomorrow)
 
-;;Diff mode hooks
-(add-hook 'diff-mode-hook
-          (lambda () (local-set-key (kbd "C-d") 'diff-split-hunk)))
-
-(add-to-list 'auto-mode-alist '("\\.in\\'" . python-mode))
 
 ;; Function Definitions
 (defun load-emacs ()
@@ -875,33 +927,33 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 ;; Reset the startup screen
 (setq frame-title-format "%b - emacs")
-(message "Welcome to Emacs!")
+;(message "Welcome to Emacs!")
 
-(cond ((eq system-type 'darwin)
-       (toggle-frame-maximized)
-       (add-to-list 'default-frame-alist '(fullscreen . maximized))
-       ;;(set-face-attribute 'default nil :height font_size_ws)
-       )
-)
+;; (cond ((eq system-type 'darwin)
+;;        (toggle-frame-maximized)
+;;        (add-to-list 'default-frame-alist '(fullscreen . maximized))
+;;        ;;(set-face-attribute 'default nil :height font_size_ws)
+;;        )
+;; )
 
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (replace-regexp-in-string
-                          "[ \t\n]*$"
-                          ""
-                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
-    (setenv "PATH" path-from-shell)
-    (setq eshell-path-env path-from-shell) ; for eshell users
-    (setq exec-path (split-string path-from-shell path-separator))))
+;; (defun set-exec-path-from-shell-PATH ()
+;;   (let ((path-from-shell (replace-regexp-in-string
+;;                           "[ \t\n]*$"
+;;                           ""
+;;                           (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+;;     (setenv "PATH" path-from-shell)
+;;     (setq eshell-path-env path-from-shell) ; for eshell users
+;;     (setq exec-path (split-string path-from-shell path-separator))))
 
-(when window-system (set-exec-path-from-shell-PATH))
+;; (when window-system (set-exec-path-from-shell-PATH))
 
 (setenv "GOPATH" "/Users/kashankar/go/bin")
-(setenv "PYTHONPATH" "/Users/kashankar/pan/ws1/saas-infra/src/apps/orchestrator/")
 (add-to-list 'exec-path "/Users/kashankar/go/bin")
+(add-to-list 'exec-path "/Users/kashankar/.pyenv/shims")
+;(add-to-list 'exec-path "/Users/kashankar/.local/bin")
 (add-to-list 'load-path "/place/where/you/put/it/")
 (autoload 'go-mode "go-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-(add-hook 'go-mode-hook 'lsp-deferred)
 
 (defun compile-go ()
   (interactive)
@@ -929,7 +981,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   ; Godef jump key binding
   (setq indent-tabs-mode t)
   (tab-width 4)
-  (local-set-key [f9]    'compile-go)
+  ;(local-set-key [f9]    'compile-go)
   (local-set-key [C-f9]  'run-go)
   (local-set-key "\M-g"  'go-guru-definition)
   )
@@ -955,7 +1007,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 ;;(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
 ;;(add-hook 'elpy-mode-hook 'flycheck-mode))
 
-(add-hook 'python-mode-hook 'cscope-minor-mode)
 ;; Enable autopep8
 (require 'py-autopep8)
 ;(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
@@ -1000,7 +1051,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             (local-set-key (kbd "S-F")    'end-of-defun)
             (local-set-key (kbd "M-p")    'elpy-check)
             ;;(local-set-key (kbd "s-d") 'p4-diff)
-            (local-set-key [f9]    'compile-lambda)
+            ;;(local-set-key [f9]    'compile-lambda)
             (local-set-key [f10]   'elpy-check)
             )
           )
@@ -1126,7 +1177,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 (require 'so)
 (require 'helm-net)
-(require 'cl)
+(require 'cl-lib)
 
 (defun my-helm-stackoverflow-lookup ()
   (interactive)
@@ -1220,15 +1271,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 
 
 
-(use-package kubernetes
-  :ensure t
-  :commands (kubernetes-overview)
-  :config)
-  ;;(setq kubernetes-poll-frequency 3600
-        ;;kubernetes-redraw-frequency 3600))
-
-
-
  (setq org-latex-pdf-process
           '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
@@ -1319,3 +1361,81 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
                                       ("\\chapter{%s}" . "\\chapter*{%s}")
                                       ("\\section{%s}" . "\\section*{%s}")
                                       ("\\subsection{%s}" . "\\subsection*{%s}")))
+
+
+(defun my-apply-patch (start end)
+  "Apply a patch from the selected region using the patch command-line tool."
+  (interactive "r")
+  (let* ((patch-content (buffer-substring-no-properties start end))
+         (patch-file (make-temp-file "patch"))
+         (output-buffer (generate-new-buffer "*Patch Output*")))
+    (with-temp-file patch-file
+      (insert patch-content))
+    (shell-command-on-region start end (format "patch -p0 --forward < %s" patch-file) output-buffer)
+    (switch-to-buffer output-buffer)))
+
+(global-set-key (kbd "C-c a") 'my-apply-patch)
+
+(defun get-file-dir-or-home ()
+  "If inside a file buffer, return the directory, else return home"
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+     "~/"
+     (file-name-directory filename))))
+
+(defun iterm-goto-filedir-or-home ()
+  "Go to present working dir and focus iterm"
+  (interactive)
+  (do-applescript
+   (concat
+    " tell application \"iTerm2\"\n"
+    "   tell the current session of current window\n"
+    (format "     write text \"cd %s\" \n" (get-file-dir-or-home))
+    "   end tell\n"
+    " end tell\n"
+    " do shell script \"open -a iTerm\"\n"
+    ))
+  )
+
+(defun iterm-focus ()
+  (interactive)
+  (do-applescript
+   " do shell script \"open -a iTerm\"\n"
+   ))
+
+(defun roam-org-collate-dailies-into-weeklies ()
+  "Collate daily notes from the last 7 days into a weekly note."
+  (interactive)
+  (let ((end-date (format-time-string "%Y-%m-%d"))
+        (start-date (format-time-string "%Y-%m-%d" (time-subtract (current-time) (days-to-time 7))))
+        daily-files
+        weekly-file
+        (content "")) ; Initialize content as an empty string
+    ;; Iterate through the last 7 days and collect daily files
+    (dotimes (i 7)
+      (let* ((date (format-time-string "%Y-%m-%d" (time-subtract (current-time) (days-to-time i))))
+             (daily-file (concat org-roam-directory "daily/" date ".org")))
+        (message (concat "here " daily-file))
+        (when (file-exists-p daily-file)
+          (message (concat"here " daily-file))
+          (setq daily-files (append daily-files (list daily-file))))))
+    (setq weekly-file (format "%s/week-of-%s-to-%s.org" org-roam-directory start-date end-date))
+    ;; Iterate through daily files and collect content
+    (dolist (file daily-files)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (goto-char (point-min))
+        ;; Skip everything before the end of the header
+        (when (search-forward "END:" nil t)
+          (forward-line 1))
+        (setq content (concat content "\n" (buffer-substring (point) (point-max))))))
+    ;; Create or open the weekly file
+    (find-file weekly-file)
+    (goto-char (point-max))
+    (insert content)
+    (save-buffer)
+    (message "Weekly note created for %s to %s" start-date end-date)))
+
+;; Optional: Bind the function to a key
+(global-set-key (kbd "C-c w") 'roam-org-collate-dailies-into-weeklies)
