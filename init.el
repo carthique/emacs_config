@@ -466,6 +466,7 @@
 (global-set-key [f1] 'my-helm-stackoverflow-lookup)
 ;;(global-set-key [M-f1]  (lambda() (interactive)(dired "~/backup/scratchpad/")))
 (global-set-key [f2]    'goto-line)
+(global-set-key [M-f2]  'match-paren)
 ;(global-set-key [C-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_ws)))
 ;(global-set-key [M-f2] (lambda() (interactive)(set-face-attribute 'default nil :height font_size_mac)))
 (global-set-key [f3]    'magit-status)
@@ -479,7 +480,6 @@
 (global-set-key [M-f8]  'magit-log-all-branches)
 (global-set-key [f9]    'org-roam-node-find)
 ;(global-set-key [f10]   (lambda() (interactive)(find-file (concat home_dir "backup/scratchpad/ut.org"))))
-(global-set-key [M-f11]   'match-paren)
 (global-set-key [f12]   'open-emacs-file)
 (global-set-key [M-f12] 'load-emacs)
 (global-set-key [f13]  'open-log-file)
@@ -491,6 +491,7 @@
 (global-set-key [f11] 'org-roam-dailies-goto-today)
 (global-set-key [M-f11] 'org-roam-dailies-goto-tomorrow)
 (global-set-key [C-f11] 'org-roam-dailies-goto-yesterday)
+(global-set-key [s-f11] 'roam-org-collate-dailies-into-weeklies)
 
 
 (global-set-key (kbd "M-0") 'magit-refs-ws0)
@@ -1404,24 +1405,60 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
    " do shell script \"open -a iTerm\"\n"
    ))
 
+;; (defun roam-org-collate-dailies-into-weeklies ()
+;;   "Collate daily notes from the last 7 days into a weekly note."
+;;   (interactive)
+;;   (let* ((num-days (read-number "Enter number of days: ")) ; Ask user for number of days
+;;          (end-date (format-time-string "%Y-%m-%d"))
+;;          (start-date (format-time-string "%Y-%m-%d" (time-subtract (current-time) (days-to-time 10))))
+;;         daily-files
+;;         weekly-file
+;;         (content "")) ; Initialize content as an empty string
+;;     ;; Iterate through the last 7 days and collect daily files
+;;     (dotimes (i 10)
+;;       (let* ((date (format-time-string "%Y-%m-%d" (time-subtract (current-time) (days-to-time i))))
+;;              (daily-file (concat org-roam-directory "daily/" date ".org")))
+;;         (message (concat "here " daily-file))
+;;         (when (file-exists-p daily-file)
+;;           (message (concat"here " daily-file))
+;;           (setq daily-files (append daily-files (list daily-file))))))
+;;     (setq weekly-file (format "%s/week-of-%s-to-%s.org" org-roam-directory start-date end-date))
+;;     ;; Iterate through daily files and collect content
+;;     (dolist (file daily-files)
+;;       (with-temp-buffer
+;;         (insert-file-contents file)
+;;         (goto-char (point-min))
+;;         ;; Skip everything before the end of the header
+;;         (when (search-forward "END:" nil t)
+;;           (forward-line 1))
+;;         (setq content (concat content "\n" (buffer-substring (point) (point-max))))))
+;;     ;; Create or open the weekly file
+;;     (find-file weekly-file)
+;;     (goto-char (point-max))
+;;     (insert content)
+;;     (save-buffer)
+;;     (message "Weekly note created for %s to %s" start-date end-date)))
+
 (defun roam-org-collate-dailies-into-weeklies ()
   "Collate daily notes from the last 7 days into a weekly note."
   (interactive)
-  (let ((end-date (format-time-string "%Y-%m-%d"))
-        (start-date (format-time-string "%Y-%m-%d" (time-subtract (current-time) (days-to-time 7))))
+  (let* ((num-days (read-number "Enter number of days: ")) ; Ask user for number of days
+         (end-date (format-time-string "%Y-%m-%d"))
+         (start-date (format-time-string "%Y-%m-%d" (time-subtract (current-time) (days-to-time 10))))
         daily-files
         weekly-file
         (content "")) ; Initialize content as an empty string
     ;; Iterate through the last 7 days and collect daily files
-    (dotimes (i 7)
+    (dotimes (i 10)
       (let* ((date (format-time-string "%Y-%m-%d" (time-subtract (current-time) (days-to-time i))))
              (daily-file (concat org-roam-directory "daily/" date ".org")))
         (message (concat "here " daily-file))
         (when (file-exists-p daily-file)
           (message (concat"here " daily-file))
           (setq daily-files (append daily-files (list daily-file))))))
-    (setq weekly-file (format "%s/week-of-%s-to-%s.org" org-roam-directory start-date end-date))
+    (setq weekly-title (format "Weekly Status %s-to-%s" start-date end-date))
     ;; Iterate through daily files and collect content
+    (setq content (concat content weekly-title "\n"))
     (dolist (file daily-files)
       (with-temp-buffer
         (insert-file-contents file)
@@ -1430,12 +1467,19 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
         (when (search-forward "END:" nil t)
           (forward-line 1))
         (setq content (concat content "\n" (buffer-substring (point) (point-max))))))
-    ;; Create or open the weekly file
-    (find-file weekly-file)
+    ;; Create or open the weekly Org-roam note
+;;     (org-roam-capture- :keys "w"
+;;                        :node (org-roam-node-create :title weekly-title)
+;;                        :templates '(("w" "weekly" plain (function org-roam-capture--get-point)
+;;                                      "%?"
+;;                                      :file-name "weeklies/${slug}"
+;;                                      :head "#+title: ${title}\n\n"
+;;                                      :unnarrowed t))
+;;                        :target (file+head "weeklies/${slug}.org" "#+title: ${title}\n\n")
+;; )
+    ;; Create or open the weekly Org-roam note
+    (org-roam-node-find "Weekly")
     (goto-char (point-max))
     (insert content)
     (save-buffer)
     (message "Weekly note created for %s to %s" start-date end-date)))
-
-;; Optional: Bind the function to a key
-(global-set-key (kbd "C-c w") 'roam-org-collate-dailies-into-weeklies)
