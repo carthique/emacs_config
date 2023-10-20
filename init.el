@@ -26,8 +26,97 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
+ '(connection-local-criteria-alist
+   '(((:application tramp :protocol "flatpak")
+      tramp-container-connection-local-default-flatpak-profile)
+     ((:application tramp :machine "localhost")
+      tramp-connection-local-darwin-ps-profile)
+     ((:application tramp :machine "M-C02DV5D6MD6M")
+      tramp-connection-local-darwin-ps-profile)
+     ((:application tramp)
+      tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)
+     ((:application eshell)
+      eshell-connection-default-profile)))
+ '(connection-local-profile-alist
+   '((tramp-container-connection-local-default-flatpak-profile
+      (tramp-remote-path "/app/bin" tramp-default-remote-path "/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin" "/local/bin" "/local/freeware/bin" "/local/gnu/bin" "/usr/freeware/bin" "/usr/pkg/bin" "/usr/contrib/bin" "/opt/bin" "/opt/sbin" "/opt/local/bin"))
+     (tramp-connection-local-darwin-ps-profile
+      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (euid . number)
+       (user . string)
+       (egid . number)
+       (comm . 52)
+       (state . 5)
+       (ppid . number)
+       (pgrp . number)
+       (sess . number)
+       (ttname . string)
+       (tpgid . number)
+       (minflt . number)
+       (majflt . number)
+       (time . tramp-ps-time)
+       (pri . number)
+       (nice . number)
+       (vsize . number)
+       (rss . number)
+       (etime . tramp-ps-time)
+       (pcpu . number)
+       (pmem . number)
+       (args)))
+     (tramp-connection-local-busybox-ps-profile
+      (tramp-process-attributes-ps-args "-o" "pid,user,group,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "stat=abcde" "-o" "ppid,pgid,tty,time,nice,etime,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (user . string)
+       (group . string)
+       (comm . 52)
+       (state . 5)
+       (ppid . number)
+       (pgrp . number)
+       (ttname . string)
+       (time . tramp-ps-time)
+       (nice . number)
+       (etime . tramp-ps-time)
+       (args)))
+     (tramp-connection-local-bsd-ps-profile
+      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,euid,user,egid,egroup,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state,ppid,pgid,sid,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etimes,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (euid . number)
+       (user . string)
+       (egid . number)
+       (group . string)
+       (comm . 52)
+       (state . string)
+       (ppid . number)
+       (pgrp . number)
+       (sess . number)
+       (ttname . string)
+       (tpgid . number)
+       (minflt . number)
+       (majflt . number)
+       (time . tramp-ps-time)
+       (pri . number)
+       (nice . number)
+       (vsize . number)
+       (rss . number)
+       (etime . number)
+       (pcpu . number)
+       (pmem . number)
+       (args)))
+     (tramp-connection-local-default-shell-profile
+      (shell-file-name . "/bin/sh")
+      (shell-command-switch . "-c"))
+     (tramp-connection-local-default-system-profile
+      (path-separator . ":")
+      (null-device . "/dev/null"))
+     (eshell-connection-default-profile
+      (eshell-path-env-list))))
  '(custom-safe-themes
    '("bcc6775934c9adf5f3bd1f428326ce0dcd34d743a92df48c128e6438b815b44f" "68d36308fc6e7395f7e6355f92c1dd9029c7a672cbecf8048e2933a053cf27e6" "400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default))
+ '(exec-path-from-shell-arguments '("-c"))
  '(global-evil-search-highlight-persist t)
  '(gnutls-algorithm-priority "normal:-vers-tls1.3")
  '(magit-commit-arguments '("--all"))
@@ -35,7 +124,7 @@
  '(magit-fetch-arguments '("--prune"))
  '(magit-pull-arguments nil)
  '(package-selected-packages
-   '(lsp-mode python-pytest pytest org-bullets kubernetes-tramp helm-projectile projectile org-roam-ui websocket helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
+   '(realgud counsel lsp-mode python-pytest pytest org-bullets kubernetes-tramp helm-projectile projectile org-roam-ui websocket helm helm-net flymake-python flymake-python-pyflakes dired-git-info sublimity pylint blacken elpy leetcode dockerfile-mode docker go-eldoc k8s-mode kubernetes yaml-mode neotree go-guru go-autocomplete exec-path-from-shell go-complete exwm xah-replace-pairs dired xeu_elisp_util xfrp_find_replace_pairs use-package company-tabnine string-inflection org-jira dumb-jump scp ssh fzf dash s py-autopep8 multi-compile git bpr magit-org-todos magit-filenotify magit expand-region iedit auto-complete-c-headers yasnippet auto-compile ibuffer-git hungry-delete hydandata-light-theme pt wgrep avy igrep zenburn-theme xah-find thingatpt+ sudo-edit smex smart-tab rainbow-delimiters material-theme leuven-theme highlight hc-zenburn-theme gotham-theme git-timemachine gh dired-toggle-sudo atom-dark-theme anzu alert ac-alchemist))
  '(warning-suppress-log-types '((comp) (comp)))
  '(warning-suppress-types '((comp))))
 ;; (add-to-list 'package-archives
@@ -112,6 +201,7 @@
 (use-package magit :defer t)
 (use-package docker :defer t)
 (use-package helm :defer t)
+(use-package realgud :defer t)
 (setq yas-verbosity 1)
 (use-package k8s-mode :ensure t
                       :hook (k8s-mode . yas-minor-mode))
@@ -661,16 +751,55 @@
     (setq myresult (tap-thing-at-point-as-string 'sexp))
     (setq myresult (read-string (format "Grep in branch (%s): " myresult)
                                 nil nil myresult))
-    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
+    ;; Escape special characters in myresult
+    (setq myresult (replace-regexp-in-string "[\"\\]" "\\\\\\&" myresult))
+    (message "myresult: %s" myresult)
     (let ((default-directory
             (f-long(vc-root-dir))))
-            ;(concat "" root_dir)))
+          ;(concat "" root_dir)))
       (if (file-exists-p "cscope.files")
-          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
-        (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal --exclude-dir=tests -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
-        )
+          (grep-find (concat "cat cscope.files | xargs grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 \"" myresult "\""))
+          (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
+          )
       ;;(highlight-phrase myresult "hi-yellow")
       )))
+
+;; (defun mygrep_dir_all ()
+;;   "grep function for grepint `xah-get-thing-at-cursor' "
+;;   (interactive)
+;;   (my-tell-user-about-directory)
+;;   ;(kill-grep)
+;;   (let (mygrepresult)
+;;     ;(setq bds (xah-get-thing-at-cursor 'word))
+;;     ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
+;;     (setq myresult (tap-thing-at-point-as-string 'sexp))
+;;     (setq myresult (read-string (format "Grep in branch (%s): " myresult)
+;;                                 nil nil myresult))
+;;     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
+;;     (let ((default-directory
+;;             (f-long(vc-root-dir))))
+;;             ;(concat "" root_dir)))
+;;       (if (file-exists-p "cscope.files")
+;;           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
+;;         (grep (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( {} + | grep -B 1 '"  myresult "'"))
+;;         )
+;;       ;;(highlight-phrase myresult "hi-yellow")
+;;       )))
+
+;; (defun mygrep_dir_all ()
+;;   "Grep function for grepping `xah-get-thing-at-cursor'."
+;;   (interactive)
+;;   (let ((myresult (tap-thing-at-point-as-string 'sexp)))
+;;     (setq myresult (read-string (format "Grep in branch (%s): " myresult) nil nil myresult))
+;;     (let* ((default-directory (f-long (vc-root-dir)))
+;;            (grep-command
+;;             (if (file-exists-p "cscope.files")
+;;                 (format "grep -I -sn -e '%s' $(cat cscope.files) | grep -B 1 '%s'"
+;;                         myresult myresult)
+;;               (format "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e '%s' -e '\\w.*' {} + | grep -B 1 '%s'"
+;;                       myresult myresult))))
+;;       (grep grep-command))))
+
 
 (defun mygrep ()
   "grep function for grepint `xah-get-thing-at-cursor' "
@@ -1483,3 +1612,64 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     (insert content)
     (save-buffer)
     (message "Weekly note created for %s to %s" start-date end-date)))
+
+;; (defun my-git-grep-in-directory (directory search-term)
+;;   "Search for SEARCH-TERM using 'git grep' in all Git repositories within one level of DIRECTORY."
+;;   (interactive "DDirectory: \nsSearch for: ")
+;;   (let ((buffer-name (generate-new-buffer-name "*git-grep-results*")))
+;;     (with-current-buffer (get-buffer-create buffer-name)
+;;       (my-git-grep-in-directory-helper directory search-term))
+;;     (pop-to-buffer buffer-name)))
+
+;; (defun my-git-grep-in-directory-helper (directory search-term)
+;;   "Helper function to search for SEARCH-TERM using 'git grep' in all Git repositories within one level of DIRECTORY."
+;;   (message (format "Searching in directory: %s" directory))
+;;   (dolist (file (directory-files directory t))
+;;     (when (and (file-directory-p file)
+;;                (not (string-suffix-p "." (file-name-nondirectory file)))
+;;                (not (string-suffix-p ".." (file-name-nondirectory file))))
+;;       (let ((default-directory file))
+;;         (message (format "Checking directory: %s" default-directory))
+;;         (if (file-exists-p (expand-file-name ".git" file))
+;;             (progn
+;;               (message (format "Searching in Git repository: %s" default-directory))
+;;               (shell-command (format "git grep -n '%s'" search-term) t)))))))
+
+;; (global-set-key (kbd "C-c g") 'my-git-grep-in-directory)
+
+(defun my-git-grep-in-directory (directory search-term)
+  "Search for SEARCH-TERM using 'git grep' in all Git repositories within one level of DIRECTORY."
+  (interactive "DDirectory: \nsSearch for: ")
+  (let ((buffer-name (generate-new-buffer-name "*git-grep-results*"))
+        (default-directory directory)
+        (base-path-length (length (expand-file-name directory))))
+    (with-current-buffer (get-buffer-create buffer-name)
+      (my-git-grep-in-directory-helper directory search-term base-path-length))
+    (pop-to-buffer buffer-name)))
+
+(defun my-git-grep-in-directory-helper (directory search-term base-path-length)
+  "Helper function to search for SEARCH-TERM using 'git grep' in all Git repositories within one level of DIRECTORY."
+  (message (format "Searching in directory: %s" directory))
+  (dolist (file (directory-files directory t))
+    (when (and (file-directory-p file)
+               (not (string-suffix-p "." (file-name-nondirectory file)))
+               (not (string-suffix-p ".." (file-name-nondirectory file))))
+      (let ((default-directory file))
+        (if (file-exists-p (expand-file-name ".git" file))
+            (progn
+              (message (format "Searching in Git repository: %s" default-directory))
+              (let ((grep-command (format "git grep -n '%s'" search-term)))
+                (let ((output (shell-command-to-string grep-command)))
+                  (with-temp-buffer
+                    (insert output)
+                    (goto-char (point-min))
+                    (while (re-search-forward "\\(.*\\):\\([0-9]+\\):\\(.*\\)$" nil t)
+                      (let* ((matched-path (match-string 1))
+                             (line-number (match-string 2))
+                             (match-text (match-string 3))
+                             (relative-path (substring matched-path base-path-length)))
+                        (delete-region (match-beginning 0) (match-end 0))
+                        (insert (format "%s:%s:%s\n" relative-path line-number match-text))))))))
+          (my-git-grep-in-directory-helper file search-term base-path-length))))))
+
+(global-set-key (kbd "C-c g") 'my-git-grep-in-directory)
