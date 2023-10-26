@@ -165,7 +165,6 @@
 
 (setq x-select-request-type 'STRING)
 (add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
-;(run-with-idle-timer 0.1 nil 'toggle-fullscreen)
 (set-cursor-color "#ffffff")
 ;(set-face-attribute 'default nil :height font_size_ws)
 
@@ -202,6 +201,7 @@
 (use-package docker :defer t)
 (use-package helm :defer t)
 (use-package realgud :defer t)
+(setq realgud-safe-mode nil)
 (setq yas-verbosity 1)
 (use-package k8s-mode :ensure t
                       :hook (k8s-mode . yas-minor-mode))
@@ -274,6 +274,10 @@
   (custom-set-variables
  '(exec-path-from-shell-arguments '("-c")))
   (exec-path-from-shell-initialize))
+(use-package ansi-color
+  :ensure t
+  :config
+  (add-hook 'compilation-filter-hook 'ansi-color-process-output))
 ;; End of base packages
 
 ;; (setq gc-cons-threshold (* 100 1024 1024))
@@ -428,6 +432,9 @@
   (setq-default flymake-diagnostic-functions nil
                 flymake-highlight-line nil
                 flymake-start-on-flymake-mode nil))
+;(add-to-list 'flake8-plugins 'flake8-colors)
+(setq flymake-python-flake8-executable "~/.flake8")
+
 ;;(use-package flymake-go :defer t)
 ;;(use-package flymake-python-pyflakes :defer t)
 (use-package go-eldoc :defer t)
@@ -452,7 +459,10 @@
               ("M-," . pop-tag-mark))
   )
   (elpy-enable)
-)
+  )
+(setq python-flymake-command '("/Users/kashankar/.pyenv/shims/flake8" "--config=/Users/kashankar/.flake8" "-"))
+(setq python-check-command "/Users/kashankar/.pyenv/shims/flake8 --config=/Users/kashankar/.flake8 --statistics --color=never ")
+(setq elpy-syntax-check-command python-check-command)
 
 (use-package py-autopep8 :defer t)
 (use-package blacken :defer t)
@@ -574,6 +584,9 @@
 (global-set-key [f13]  'open-log-file)
 (global-set-key (kbd "C-Q") 'er/expand-region)
 (global-set-key (kbd "C-f") 'avy-goto-char-timer)
+(global-set-key (kbd "C-w") 'toggle-fullscreen-1)
+(global-set-key (kbd "M-s-<left>")  'windmove-left)
+(global-set-key (kbd "M-s-<right>")  'windmove-right)
 ;(global-set-key (kbd "M-<up>") 'beginning-of-defun)
 ;(global-set-key (kbd "M-<down>") 'end-of-defun)
 ;(global-set-key (kbd "C-a") 'mark-whole-buffer)
@@ -581,7 +594,6 @@
 (global-set-key [M-f11] 'org-roam-dailies-goto-tomorrow)
 (global-set-key [C-f11] 'org-roam-dailies-goto-yesterday)
 (global-set-key [s-f11] 'roam-org-collate-dailies-into-weeklies)
-
 
 (global-set-key (kbd "M-0") 'magit-refs-ws0)
 (global-set-key (kbd "M-1") 'magit-refs-ws1)
@@ -957,14 +969,6 @@ Also returns nil if pid is nil."
   (let ((default-directory
           (concat "" "~/ws7/panos/")))
     (magit-show-refs)))
-
-(defun toggle-fullscreen ()
-  "Toggle full screen on X11"
-  (interactive)
-  (when (eq window-system 'x)
-    (set-frame-parameter
-     nil 'fullscreen
-     (when (not (frame-parameter nil 'fullscreen)) 'fullboth))))
 
 (defun mygid ()
   "grep function for grepint `xah-get-thing-at-cursor' "
@@ -1684,5 +1688,39 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
           (replace-match (concat "%" (number-to-string arg-number) "%%") nil nil nil 2)))))
     (message "Python % string formatting converted to f-strings.")))
 
-(grep-a-lot-setup-keys)
+(require 'ansi-color)
 
+(defun my-elpy-check-filter ()
+  "Filter Elpy check results to display only critical errors."
+  (interactive)
+  (elpy-check)
+  (let ((error-regexp "error\\|E:"))
+    (with-current-buffer "*compilation*"
+      (ansi-color-apply-on-region (point-min) (point-max)) ; Apply ANSI color codes
+      (goto-char (point-min))
+      (while (re-search-forward error-regexp nil t)
+        (unless (string-match "warning\\|W:" (match-string 0))
+          (move-beginning-of-line 1)
+          (kill-line)
+          (yank))))))
+
+(defvar my-fullscreen-config nil
+  "Variable to store the previous window configuration.")
+
+(defun toggle-fullscreen-1 ()
+  "Toggle between fullscreen and previous window configuration."
+  (interactive)
+  (if (null my-fullscreen-config)
+      (progn
+        ;; Save the current window configuration
+        (setq my-fullscreen-config (current-window-configuration))
+        ;; Make the selected window full-screen
+        (delete-other-windows))
+    (progn
+      ;; Restore the previous window configuration
+      (set-window-configuration my-fullscreen-config)
+      (setq my-fullscreen-config nil))))
+
+(global-set-key (kbd "<f11>") 'toggle-fullscreen-1)
+
+(grep-a-lot-setup-keys)
