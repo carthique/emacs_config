@@ -279,6 +279,7 @@
 ;; (setq gc-cons-threshold (* 100 1024 1024))
 ;; (setq read-process-output-max (* 1024 1024)) ; 1 MB
 (setenv "PYTHONPATH" "/Users/kashankar/code/patches:/Users/kashankar/code/saas-infra/src/apps/orchestrator:/Users/kashankar/code/saas-infra/src/apps/lambda")
+(setenv "LC_ALL" "C")
 ;;(setenv "PATH" "/Users/kashankar/.pyenv/shims:/Users/kashankar/bin:/usr/local/bin:/Users/kashankar/.local/bin:/Users/kashankar/bin:/usr/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin")
 (setq python-shell-extra-pythonpaths '("/Users/kashankar/code/saas-infra/src/apps/orchestrator/:/Users/kashankar/code/saas-infra/src/apps/lambda"))
 (setenv "AWS_REGION" "us-west-2") 
@@ -477,8 +478,6 @@
 ;; (use-package isearch-symbol-at-point :defer t)
 ;; (require 'isearch-symbol-at-point)
 
-(grep-a-lot-setup-keys)
-
 (avy-setup-default)
 (global-set-key (kbd "C-c C-j") 'avy-resume)
 
@@ -612,11 +611,13 @@
 
 (setq dumb-jump-fallback-search nil)
 ;; Meta Key bindings
-(global-set-key "\M-s"      'mygrep_dir_all)
-(global-set-key "\M-l"      'mygrep-file)
-(global-set-key "\M-d"      'vc-diff)
-(global-set-key "\M-D"       'vc-root-diff)
-(global-set-key "\C-\M-d"   'magit-diff-range)
+(global-set-key "\M-s"      'mygrep_git_all)
+(global-set-key "\M-d"      'mygrep)
+(global-set-key "\M-g"       'mygrep_def_all)
+(global-set-key "\M-a"      'mygrep_code_all)
+(global-set-key "\M-f"      'mygrep_file)
+(global-set-key "\C-d"       'vc-diff)
+(global-set-key (kbd "s-d")   'vc-root-diff)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 ;; This is your old M-x.
@@ -625,7 +626,7 @@
 ;; Super Key bindings
 (global-set-key (kbd "s-s") 'git-grep)
 (global-set-key (kbd "s-f") 'git-grep-local)
-(global-set-key (kbd "s-d") 'mygrep)
+;;(global-set-key (kbd "s-d") 'mygrep)
 (global-set-key [s-down] 'next-error)
 (global-set-key [s-up] 'previous-error)
 ;(global-set-key [s-down] 'smerge-next)
@@ -644,8 +645,8 @@
 (global-set-key (kbd "s-7") 'magit-refs-ws7)
 ;;(global-set-key (kbd "s-d") (lambda() (interactive)(write-file "~/patch.diff")))
 (global-set-key (kbd "s-w") 'gid)
-(global-set-key (kbd "s-<left>")  'grep-a-lot-goto-prev)
-(global-set-key (kbd "s-<right>") 'grep-a-lot-goto-next)
+;(global-set-key (kbd "s-<left>")  'grep-a-lot-goto-prev)
+;(global-set-key (kbd "s-<right>") 'grep-a-lot-goto-next)
 (global-set-key [s-tab] 'avy-goto-char-timer)
 (global-set-key (kbd "C-s-s") 'sudo-edit-current-file)
 ;;(global-set-key (kbd "s-c") 'string-inflection-lower-camelcase)
@@ -740,96 +741,90 @@
          (ignore-errors
            (vc-call-backend backend 'root default-directory)))))
 
-(defun mygrep_dir_all ()
+(defun mygrep_git_all ()
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
   (my-tell-user-about-directory)
-  ;(kill-grep)
   (let (mygrepresult)
-    ;(setq bds (xah-get-thing-at-cursor 'word))
-    ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
     (setq myresult (tap-thing-at-point-as-string 'sexp))
     (setq myresult (read-string (format "Grep in branch (%s): " myresult)
                                 nil nil myresult))
     ;; Escape special characters in myresult
     (setq myresult (replace-regexp-in-string "[\"\\]" "\\\\\\&" myresult))
-    (message "myresult: %s" myresult)
-    (let ((default-directory
-            (f-long(vc-root-dir))))
-          ;(concat "" root_dir)))
-      (if (file-exists-p "cscope.files")
-          (grep-find (concat "cat cscope.files | xargs grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 \"" myresult "\""))
-          (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
-          )
-      ;;(highlight-phrase myresult "hi-yellow")
+    (let ((git-root (vc-git-root default-directory)))
+      (if git-root
+          (setq default-directory git-root)
+        (setq default-directory "~/code"))
+      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
       )))
 
-;; (defun mygrep_dir_all ()
-;;   "grep function for grepint `xah-get-thing-at-cursor' "
-;;   (interactive)
-;;   (my-tell-user-about-directory)
-;;   ;(kill-grep)
-;;   (let (mygrepresult)
-;;     ;(setq bds (xah-get-thing-at-cursor 'word))
-;;     ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
-;;     (setq myresult (tap-thing-at-point-as-string 'sexp))
-;;     (setq myresult (read-string (format "Grep in branch (%s): " myresult)
-;;                                 nil nil myresult))
-;;     (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
-;;     (let ((default-directory
-;;             (f-long(vc-root-dir))))
-;;             ;(concat "" root_dir)))
-;;       (if (file-exists-p "cscope.files")
-;;           (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
-;;         (grep (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( {} + | grep -B 1 '"  myresult "'"))
-;;         )
-;;       ;;(highlight-phrase myresult "hi-yellow")
-;;       )))
+(defun mygrep_def_all ()
+  "grep function for grepint `xah-get-thing-at-cursor' "
+  (interactive)
+  (my-tell-user-about-directory)
+  (let (mygrepresult)
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Grep for definition (%s): " myresult)
+                                nil nil myresult))
+    ;; Escape special characters in myresult
+    (setq myresult (replace-regexp-in-string "[\"\\]" "\\\\\\&" myresult))
+    (let ((git-root (vc-git-root default-directory)))
+      (if git-root
+          (setq default-directory git-root)
+        (setq default-directory "~/code"))
+      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e '^\\(def \\|class \\)' \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
+      )))
 
-;; (defun mygrep_dir_all ()
-;;   "Grep function for grepping `xah-get-thing-at-cursor'."
-;;   (interactive)
-;;   (let ((myresult (tap-thing-at-point-as-string 'sexp)))
-;;     (setq myresult (read-string (format "Grep in branch (%s): " myresult) nil nil myresult))
-;;     (let* ((default-directory (f-long (vc-root-dir)))
-;;            (grep-command
-;;             (if (file-exists-p "cscope.files")
-;;                 (format "grep -I -sn -e '%s' $(cat cscope.files) | grep -B 1 '%s'"
-;;                         myresult myresult)
-;;               (format "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e '%s' -e '\\w.*' {} + | grep -B 1 '%s'"
-;;                       myresult myresult))))
-;;       (grep grep-command))))
-
+(defun mygrep_code_all ()
+  "grep function for grepint `xah-get-thing-at-cursor' "
+  (interactive)
+  (my-tell-user-about-directory)
+  (let (mygrepresult)
+    (setq myresult (tap-thing-at-point-as-string 'sexp))
+    (setq myresult (read-string (format "Grep all code (%s): " myresult)
+                                nil nil myresult))
+    ;; Escape special characters in myresult
+    (setq myresult (replace-regexp-in-string "[\"\\]" "\\\\\\&" myresult))
+    (let ((original-default-directory default-directory) (default-directory "~/code"))
+      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
+;      (message (format "current: %s" default-directory))
+;      (message (format "original: %s" original-default-directory))
+      (setq default-directory original-default-directory))))
 
 (defun mygrep ()
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
   (let (mygrepresult)
-    ;;(setq bds (xah-get-thing-at-cursor 'word))
-    ;;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
     (setq myresult (tap-thing-at-point-as-string 'sexp))
     (setq myresult (read-string (format "Grep in directory (%s): " myresult)
                                 nil nil myresult))
-    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
-    ;;(grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.\*\\( \\-\\-include='*.h' \\-\\-include='*.c' \\-\\-include='*.cpp' \\-\\-include='*.ovsschema' \\-\\-include='*.in' \\-\\-include='*.mib' | grep -B 1 '"  myresult "'")
-    (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( \\-\\-include='*' | grep -B 1 '"  myresult "'")
-          )
-    ;;(highlight-phrase myresult "hi-yellow")
+    (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
     ))
+
+;; (defun mygrep_file ()
+;;   "grep function for grepint `xah-get-thing-at-cursor' "
+;;   (interactive)
+;;   (let (mygrepresult (filename (buffer-file-name)))
+;;     (setq myresult (tap-thing-at-point-as-string 'sexp))
+;;     (setq myresult (read-string (format "Grep in file (%s): " myresult)
+;;                                 nil nil myresult))
+;;     (grep-find (concat "grep -H -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( " filename " | grep -B 1 \"" myresult "\""))
+;;     ))
 
 (defun mygrep_file ()
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
-  (let (mygrepresult)
-    ;;(setq bds (tap-thing-at-point-as-string 'sexp))
-    ;;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
-    (setq myresult (tap-thing-at-point-as-string 'sexp))
+  (let ((filename (buffer-file-name))
+        (myresult (tap-thing-at-point-as-string 'sexp)))
     (setq myresult (read-string (format "Grep in file (%s): " myresult)
                                 nil nil myresult))
-    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
-    (grep (concat "grep -nHr -e '" myresult "'\\\\\\|^\\\\w.\*\\( " (file-name-nondirectory (buffer-file-name)) " | grep -B 1 '"  myresult "'")
-          )
-    ;;(highlight-phrase myresult "hi-yellow")
+    (let ((grep-command (concat "grep -H -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.*'\\( " filename " | grep -B 1 \"" myresult "\"")))
+      (compilation-start grep-command 'grep-mode)
+      (with-current-buffer "*grep*"
+        (goto-char (point-min))
+        (while (re-search-forward myresult nil t)
+          (add-text-properties (match-beginning 0) (match-end 0)
+                               '(face highlight)))))
     ))
 
 ;; XML formatting
@@ -1113,7 +1108,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   (tab-width 4)
   ;(local-set-key [f9]    'compile-go)
   (local-set-key [C-f9]  'run-go)
-  (local-set-key "\M-g"  'go-guru-definition)
   )
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
@@ -1141,28 +1135,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
 (require 'py-autopep8)
 ;(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
 
-(defun mygrep_cscope_def_all ()
-  "grep function for grepint `xah-get-thing-at-cursor' "
-  (interactive)
-  (my-tell-user-about-directory)
-  ;(kill-grep)
-  (let (mygrepresult)
-    ;(setq bds (xah-get-thing-at-cursor 'word))
-    ;(setq myresult (elt bds 0) p1 (elt bds 1) p2 (elt bds 2))
-    (setq myresult (concat "def " (tap-thing-at-point-as-string 'sexp)))
-    (setq myresult (read-string (format "Grep in branch (%s): " myresult)
-                                nil nil myresult))
-    (setq mystr (replace-regexp-in-string "-" (rx "\\-") myresult))
-    (let ((default-directory
-            (f-long(vc-root-dir))))
-            ;(concat "" root_dir)))
-      (if (file-exists-p "cscope.files")
-          (grep (concat "cat cscope.files | xargs grep -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
-        (grep (concat "find . -size -2M -cmin -9999999 | grep -v 'appportal' | xargs grep --exclude-dir=appportal -I -sn -e '" myresult "'\\\\\\|^\\\\w'.\*'\\( . | grep -B 1 '"  myresult "'"))
-        )
-      ;;(highlight-phrase myresult "hi-yellow")
-      )))
-
 (add-hook 'python-mode-hook
           (lambda ()
             (cscope-minor-mode)
@@ -1172,7 +1144,6 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
             ;; (local-set-key "\s-g"      'cscope-find-global-definition)
             ;; (local-set-key "\s-f"      'cscope-find-this-file)
             ;; (local-set-key "\s-i"      'cscope-find-files-including-file)
-            (local-set-key (kbd "M-g")    'mygrep_cscope_def_all)
             (local-set-key (kbd "M-<up>") 'beginning-of-defun)
             (local-set-key (kbd "M-<down>") 'end-of-defun)
             (local-set-key [\C-\s-up] 'python-nav-backward-up-list)
@@ -1673,3 +1644,45 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
           (my-git-grep-in-directory-helper file search-term base-path-length))))))
 
 (global-set-key (kbd "C-c g") 'my-git-grep-in-directory)
+
+(defun python-percent-to-f-string ()
+  "Convert Python % string formatting to f-strings."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "%[0-9]*[.]?[0-9]*[l]?[+-]?[ 0#]*[0-9]*\\([diouxXeEfFgGcrsa%]\\)" nil t)
+      (let ((replacement (match-string 1)))
+        (cond
+         ((string-match-p "[diouxX]" replacement)
+          (replace-match (concat "%" replacement) nil nil nil 1))
+         ((string-match-p "[eEfFgG]" replacement)
+          (replace-match (concat "%.2f" replacement) nil nil nil 1))
+         ((string= replacement "c")
+          (replace-match (concat "%c") nil nil nil 1))
+         ((string= replacement "r")
+          (replace-match (concat "%r") nil nil nil 1))
+         ((string= replacement "s")
+          (replace-match (concat "%s") nil nil nil 1))
+         ((string= replacement "%")
+          (replace-match (concat "%%") nil nil nil 1)))))
+    (goto-char (point-min))
+    (while (re-search-forward "%\\([0-9]+\\)\\$\\([diouxXeEfFgGcrsa%]\\)" nil t)
+      (let* ((arg-number (string-to-number (match-string 1)))
+             (replacement (match-string 2)))
+        (cond
+         ((string-match-p "[diouxX]" replacement)
+          (replace-match (concat "%" (number-to-string arg-number) replacement) nil nil nil 2))
+         ((string-match-p "[eEfFgG]" replacement)
+          (replace-match (concat "%" (number-to-string arg-number) ".2f" replacement) nil nil nil 2))
+         ((string= replacement "c")
+          (replace-match (concat "%" (number-to-string arg-number) "c") nil nil nil 2))
+         ((string= replacement "r")
+          (replace-match (concat "%" (number-to-string arg-number) "r") nil nil nil 2))
+         ((string= replacement "s")
+          (replace-match (concat "%" (number-to-string arg-number) "s") nil nil nil 2))
+         ((string= replacement "%")
+          (replace-match (concat "%" (number-to-string arg-number) "%%") nil nil nil 2)))))
+    (message "Python % string formatting converted to f-strings.")))
+
+(grep-a-lot-setup-keys)
+
