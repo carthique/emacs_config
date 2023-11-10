@@ -286,7 +286,7 @@
 (setenv "LC_ALL" "C")
 ;;(setenv "PATH" "/Users/kashankar/.pyenv/shims:/Users/kashankar/bin:/usr/local/bin:/Users/kashankar/.local/bin:/Users/kashankar/bin:/usr/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin")
 (setq python-shell-extra-pythonpaths '("/Users/kashankar/code/saas-infra/src/apps/orchestrator/:/Users/kashankar/code/saas-infra/src/apps/lambda"))
-(setenv "AWS_REGION" "us-west-2") 
+(setenv "AWS_REGION" "us-west-2")
 
 (require 'k8s-mode)
 ;;(require 'company-tabnine)
@@ -469,6 +469,25 @@
 (use-package pylint :defer t)
 (use-package avy :defer t)
 (use-package sublimity :defer t)
+(use-package jsonnet-mode :defer t)
+(load "jsonnet-mode")
+(add-hook 'jsonnet-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (local-set-key [f10]   'jsonnet-eval-buffer)
+            )
+          )
+(use-package gitlab-ci-mode :defer t)
+(load "gitlab-ci-mode")
+(add-hook 'yaml-mode
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (local-set-key [f10] 'gitlab-ci-lint)
+            )
+          )
+(use-package lab :defer t)
+(require 'lab)
+
 ;;(use-package company-tabnine :ensure t)
 (use-package pytest :ensure t)
 (use-package python-pytest :ensure t)
@@ -767,7 +786,7 @@
       (if git-root
           (setq default-directory git-root)
         (setq default-directory "~/code"))
-      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
+      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov -o -name .tmp \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep --color=always -B 1 \"" myresult "\""))
       )))
 
 (defun mygrep_def_all ()
@@ -784,7 +803,7 @@
       (if git-root
           (setq default-directory git-root)
         (setq default-directory "~/code"))
-      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e '^\\(def \\|class \\)' \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
+      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov -o -name .tmp \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e '^\\(def \\|class \\)' \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep --color=always -B 1 \"" myresult "\""))
       )))
 
 (defun mygrep_code_all ()
@@ -798,46 +817,77 @@
     ;; Escape special characters in myresult
     (setq myresult (replace-regexp-in-string "[\"\\]" "\\\\\\&" myresult))
     (let ((original-default-directory default-directory) (default-directory "~/code"))
-      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
-;      (message (format "current: %s" default-directory))
-;      (message (format "original: %s" original-default-directory))
+      (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov -o -name .tmp \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep --color=always -B 1 \"" myresult "\""))
       (setq default-directory original-default-directory))))
+
+;; (defun mygrep ()
+;;   "grep function for grepint `xah-get-thing-at-cursor' "
+;;   (interactive)
+;;   (let (mygrepresult)
+;;     (setq myresult (tap-thing-at-point-as-string 'sexp))
+;;     (setq myresult (read-string (format "Grep in directory (%s): " myresult)
+;;                                 nil nil myresult))
+;;     (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov -o -name .tmp \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep --color=always -B 1 \"" myresult "\""))
+;;     ))
+
+(defface match
+  '((((class color) (min-colors 88) (background light))
+     :background "khaki1")
+    (((class color) (min-colors 88) (background light))
+     :background "DarkOrange")
+    (((class color) (min-colors 8) (background light))
+     :background "yellow" :foreground "black")
+    (((class color) (min-colors 8) (background dark))
+     :background "blue" :foreground "white")
+    (((type tty) (class mono))
+     :inverse-video t)
+    (t :background "gray"))
+  "Face used to highlight matches permanently."
+  :group 'matching
+  :group 'basic-faces
+  :version "22.1")
 
 (defun mygrep ()
   "grep function for grepint `xah-get-thing-at-cursor' "
   (interactive)
-  (let (mygrepresult)
-    (setq myresult (tap-thing-at-point-as-string 'sexp))
+  (let ((myresult (tap-thing-at-point-as-string 'sexp)))
     (setq myresult (read-string (format "Grep in directory (%s): " myresult)
                                 nil nil myresult))
-    (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep -B 1 \"" myresult "\""))
+    (grep-find (concat "find . -type d \\( -name appportal -o -name test_coverage -o -name htmlcov -o -name .tmp \\) -prune -o -type f -size -2M -cmin -9999999 -exec grep -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( '{}' + | grep --color=always -B 1 \"" myresult "\""))
     ))
+
+
+(defun mygrep_file ()
+  "grep function for grepint `xah-get-thing-at-cursor'"
+  (interactive)
+  (let ((filename (or buffer-file-name (dired-get-file-for-visit))))
+    (when (file-remote-p filename)
+      (setq filename (tramp-file-name-localname (tramp-dissect-file-name filename))))
+    (let ((myresult (tap-thing-at-point-as-string 'sexp)))
+      (setq myresult (read-string (format "Grep in file (%s): " myresult)
+                                  nil nil myresult))
+      (let ((grep-find (concat "grep -H -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.*'\\( " filename " | grep -B 1 \"" myresult "\"")))
+        (compilation-start grep-find 'grep-mode)
+        (with-current-buffer "*grep*"
+          (goto-char (point-min))
+          (highlight-regexp (regexp-quote myresult) 'hi-yellow))))))
+
 
 ;; (defun mygrep_file ()
 ;;   "grep function for grepint `xah-get-thing-at-cursor' "
 ;;   (interactive)
-;;   (let (mygrepresult (filename (buffer-file-name)))
-;;     (setq myresult (tap-thing-at-point-as-string 'sexp))
+;;   (let ((filename (buffer-file-name))
+;;         (myresult (tap-thing-at-point-as-string 'sexp)))
 ;;     (setq myresult (read-string (format "Grep in file (%s): " myresult)
 ;;                                 nil nil myresult))
-;;     (grep-find (concat "grep -H -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.\*'\\( " filename " | grep -B 1 \"" myresult "\""))
+;;     (let ((grep-command (concat "grep -H -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.*'\\( " filename " | grep -B 1 \"" myresult "\"")))
+;;       (compilation-start grep-command 'grep-mode)
+;;       (with-current-buffer "*grep*"
+;;         (goto-char (point-min))
+;;         (while (re-search-forward myresult nil t)
+;;           (add-text-properties (match-beginning 0) (match-end 0)
+;;                                '(face highlight)))))
 ;;     ))
-
-(defun mygrep_file ()
-  "grep function for grepint `xah-get-thing-at-cursor' "
-  (interactive)
-  (let ((filename (buffer-file-name))
-        (myresult (tap-thing-at-point-as-string 'sexp)))
-    (setq myresult (read-string (format "Grep in file (%s): " myresult)
-                                nil nil myresult))
-    (let ((grep-command (concat "grep -H -I -sn -e \"" myresult "\"\\\\\\|^\\\\w'.*'\\( " filename " | grep -B 1 \"" myresult "\"")))
-      (compilation-start grep-command 'grep-mode)
-      (with-current-buffer "*grep*"
-        (goto-char (point-min))
-        (while (re-search-forward myresult nil t)
-          (add-text-properties (match-beginning 0) (match-end 0)
-                               '(face highlight)))))
-    ))
 
 ;; XML formatting
 (defun remove-newlines-in-region ()
@@ -1200,6 +1250,8 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
     ;(highlight-phrase "test" "hi-yellow")
     ))
 
+(custom-set-faces
+ '(match-face ((t (:foreground "blue" :weight bold)))))
 
 (defun myfind_dir_all ()
   "grep function for grepint `xah-get-thing-at-cursor' "
