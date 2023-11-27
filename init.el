@@ -485,8 +485,21 @@
             (local-set-key [f10] 'gitlab-ci-lint)
             )
           )
-(use-package lab :defer t)
-(require 'lab)
+(use-package terraform-doc :defer t)
+(use-package terraform-mode
+  ;; if using straight
+  ;; :straight t
+
+  ;; if using package.el
+  ;; :ensure t
+  :custom (terraform-indent-level 4)
+  :config
+  (defun my-terraform-mode-init ()
+    ;; if you want to use outline-minor-mode
+    ;; (outline-minor-mode 1)
+    )
+
+  (add-hook 'terraform-mode-hook 'my-terraform-mode-init))
 
 ;;(use-package company-tabnine :ensure t)
 (use-package pytest :ensure t)
@@ -647,8 +660,10 @@
 (global-set-key "\M-g"       'mygrep_def_all)
 (global-set-key "\M-a"      'mygrep_code_all)
 (global-set-key "\M-f"      'mygrep_file)
-(global-set-key "\C-d"       'vc-diff)
-(global-set-key (kbd "s-d")   'vc-root-diff)
+(global-set-key "\C-d"       'vc-root-diff)
+(global-set-key (kbd "s-d")   'vc-diff)
+(global-set-key (kbd "C-s-d") 'my-magit-diff-upstream)
+
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 ;; This is your old M-x.
@@ -1774,5 +1789,13 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
       (setq my-fullscreen-config nil))))
 
 (global-set-key (kbd "<f11>") 'toggle-fullscreen-1)
+
+(defun my-magit-diff-upstream ()
+  "Diff current branch with its upstream branch in Magit."
+  (interactive)
+  (let ((upstream-branch (magit-get-upstream-branch)))
+    (if upstream-branch
+        (magit-diff-range upstream-branch)
+      (message "No upstream branch found."))))
 
 (grep-a-lot-setup-keys)
